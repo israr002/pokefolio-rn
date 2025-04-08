@@ -8,8 +8,12 @@
       "assets": ["src/assets"],
       "components": ["src/components"],
       "constants": ["src/constants"],
+      "hooks": ["src/hooks"],
       "navigation": ["src/navigation"],
       "screens": ["src/screens"],
+      "schemas": ["src/schemas"],
+      "styles": ["src/styles"],
+      "theme": ["src/theme"],
       "tests": ["tests"],
       "utils": ["src/utils"]
     }
