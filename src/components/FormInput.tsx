@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, useColorScheme } from 'react-native';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme/theme';
 
@@ -24,8 +24,6 @@ const FormInput = <T extends FieldValues>({
   autoCapitalize = 'none',
   error,
 }: FormInputProps<T>) => {
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === 'dark';
 
   const styles = StyleSheet.create({
     container: {
@@ -34,17 +32,17 @@ const FormInput = <T extends FieldValues>({
     label: {
       fontSize: TYPOGRAPHY.fontSize.base,
       fontWeight: TYPOGRAPHY.fontWeight.medium,
-      color: isDarkMode ? COLORS.text.light : COLORS.text.dark,
+      color: COLORS.text.dark,
       marginBottom: SPACING[2],
     },
     input: {
-      backgroundColor: isDarkMode ? COLORS.card.dark : COLORS.card.light,
+      backgroundColor: COLORS.card.light,
       borderRadius: BORDER_RADIUS.base,
       padding: SPACING[3],
       fontSize: TYPOGRAPHY.fontSize.base,
-      color: isDarkMode ? COLORS.text.light : COLORS.text.dark,
+      color: COLORS.text.dark,
       borderWidth: 1,
-      borderColor: error ? COLORS.text.error : isDarkMode ? COLORS.border.dark : COLORS.border.light,
+      borderColor: error ? COLORS.text.error : COLORS.border.light,
     },
     errorText: {
       color: COLORS.text.error,

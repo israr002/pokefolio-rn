@@ -77,3 +77,6 @@ yarn-error.log
 # Firebase config files
 android/app/google-services.json
 ios/GoogleService-Info.plist
+
+.env
+.env.*

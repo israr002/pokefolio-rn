@@ -27,10 +27,46 @@ const baseColors = {
   },
 } as const;
 
+// Opacity values
+export const OPACITY = {
+  light: '20', // 20% opacity
+  medium: '40', // 40% opacity
+  high: '60', // 60% opacity
+} as const;
+
+export const TYPE_COLORS = {
+  bug: '#A7B723',
+  dark: '#75574C',
+  dragon: '#7037FF',
+  electric: '#F9CF30',
+  fairy: '#E69EAC',
+  fighting: '#C12239',
+  fire: '#F57D31',
+  flying: '#A891EC',
+  ghost: '#70559B',
+  normal: '#AAA67F',
+  grass: '#74CB48',
+  ground: '#DEC16B',
+  ice: '#9AD6DF',
+  poison: '#A43E9E',
+  psychic: '#FB5584',
+  rock: '#B69E31',
+  steel: '#B7B9D0',
+  water: '#6493EB',
+};
+
 // Theme colors
 export const COLORS = {
+  primary: '#DC0A2D',
+  white: '#FFFFFF',
+  transluscent: 'rgba(255, 255, 255, 0.3)',
+  transparent: 'transparent',
+  black: '#000000',
+  gray: '#A3A3A3',
+  error: '#FF3B30',
+
   // Brand colors
-  primary: baseColors.orange[500],
+  //primary: baseColors.orange[500],
   secondary: baseColors.gray[100],
   accent: baseColors.orange[500],
 
@@ -65,11 +101,18 @@ export const COLORS = {
     success: baseColors.green[500],
     warning: baseColors.orange[600],
     error: baseColors.red[500],
+    errorLight: baseColors.red[500] + OPACITY.light,
   },
 } as const;
 
 // Typography scale
 export const TYPOGRAPHY = {
+  fontFamily: {
+    regular: 'SFProDisplay-Regular',
+    medium: 'SFProDisplay-Medium',
+    semibold: 'SFProDisplay-Semibold',
+    bold: 'SFProDisplay-Bold',
+  },
   fontSize: {
     xs: 12,
     sm: 14,

@@ -14,14 +14,6 @@ export const AUTH = {
   MAX_LOGIN_ATTEMPTS: 5,
 } as const;
 
-// Storage Keys
-export const STORAGE_KEYS = {
-  AUTH_TOKEN: '@auth_token',
-  USER_DATA: '@user_data',
-  THEME: '@theme',
-  LANGUAGE: '@language',
-  NOTIFICATIONS: '@notifications',
-} as const;
 
 // Animation Configuration
 export const ANIMATION = {
@@ -37,28 +29,4 @@ export const ANIMATION = {
   },
 } as const;
 
-// Layout Configuration
-export const LAYOUT = {
-  HEADER_HEIGHT: 60,
-  TAB_BAR_HEIGHT: 80,
-  BORDER_RADIUS: {
-    SMALL: 4,
-    MEDIUM: 8,
-    LARGE: 12,
-  },
-  SPACING: {
-    XS: 4,
-    SM: 8,
-    MD: 16,
-    LG: 24,
-    XL: 32,
-  },
-} as const;
 
-// Feature Flags
-export const FEATURES = {
-  ENABLE_DARK_MODE: true,
-  ENABLE_NOTIFICATIONS: true,
-  ENABLE_ANALYTICS: true,
-  ENABLE_CRASH_REPORTING: true,
-} as const; 
