@@ -1,202 +1,185 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  useColorScheme,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import auth from '@react-native-firebase/auth';
 import FormInput from 'components/FormInput';
-import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme/theme';
-
+import { COLORS, TYPOGRAPHY, SPACING } from '../theme/theme';
+import LinearGradient from 'react-native-linear-gradient';
+import { ImageSelector } from 'components/ImageSelector';
+import CustomButton from 'components/CustomButton';
+import Animated, { SlideInDown } from 'react-native-reanimated';
+import { getAuthErrorMessage } from 'utils/authErrors';
+import { APP_CONSTANTS } from 'constants/appConstants';
 
 const signupSchema = z
   .object({
-    email: z.string().email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    email: z.string().email(APP_CONSTANTS.EMAIL_INVALID),
+    password: z.string().min(6, APP_CONSTANTS.PASSWORD_TOO_SHORT),
     confirmPassword: z.string(),
   })
   .refine(data => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: APP_CONSTANTS.PASSWORDS_DONT_MATCH,
     path: ['confirmPassword'],
   });
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
 const SignupScreen = ({ navigation }: any) => {
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === 'dark';
+  const [profilePhoto, setProfilePhoto] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [signupError, setSignupError] = useState<string | null>(null);
 
-  const [firebaseError, setFirebaseError] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (signupError) {
+      const timer = setTimeout(() => {
+        setSignupError(null);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [signupError]);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-    setError,
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
 
-  const onSubmit = async (data: SignupFormData) => {
-    const {email,password} = data;
-    try {
-      setFirebaseError(null);
+  // const {signUp, firebaseError} = useAuth();
 
-      await auth().createUserWithEmailAndPassword(email, password);
+  const handleImageSelected = (uri: string) => setProfilePhoto(uri);
+
+  const onSubmit = async (data: SignupFormData) => {
+    try {
+      setIsLoading(true);
+      setSignupError(null);
+      // await signUp(data.email, data.password, profilePhoto);
+      // navigation.navigate('Home');
     } catch (error: any) {
       console.error('Signup error:', error);
-      if (error.code === 'auth/email-already-in-use') {
-        setError('email', { message: 'Email is already in use' });
-      } else if (error.code === 'auth/weak-password') {
-        setError('password', { message: 'Password is too weak' });
-      } else {
-        setFirebaseError('An error occurred. Please try again.');
-      }
+      setSignupError(getAuthErrorMessage(error));
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: isDarkMode
-        ? COLORS.background.dark
-        : COLORS.background.light,
-    },
-    gradientContainer: {
-      flex: 1,
-    },
-    content: {
-      flex: 1,
-      padding: SPACING[4],
-    },
-    logoContainer: {
-      alignItems: 'center',
-      marginTop: SPACING[8],
-      marginBottom: SPACING[8],
-    },
-    logo: {
-      width: 180,
-      height: 180,
-      marginVertical: SPACING[4],
-      opacity: 0.2,
-      tintColor: COLORS.text.light,
-    },
-    title: {
-      fontSize: TYPOGRAPHY.fontSize['3xl'],
-      fontWeight: TYPOGRAPHY.fontWeight.bold,
-      color: isDarkMode ? COLORS.text.light : COLORS.text.dark,
-      marginBottom: SPACING[1],
-    },
-    subtitle: {
-      fontSize: TYPOGRAPHY.fontSize.base,
-      color: COLORS.text.gray,
-      textAlign: 'center',
-      marginBottom: SPACING[8],
-    },
-    form: {
-      gap: SPACING[4],
-    },
-    button: {
-      backgroundColor: COLORS.primary,
-      padding: SPACING[4],
-      borderRadius: BORDER_RADIUS.base,
-      alignItems: 'center',
-      marginTop: SPACING[4],
-    },
-    buttonText: {
-      color: COLORS.text.light,
-      fontSize: TYPOGRAPHY.fontSize.lg,
-      fontWeight: TYPOGRAPHY.fontWeight.semibold,
-    },
-    footer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      marginTop: SPACING[8],
-    },
-    footerText: {
-      color: COLORS.text.gray,
-      fontSize: TYPOGRAPHY.fontSize.base,
-    },
-    footerLink: {
-      color: COLORS.primary,
-      fontWeight: TYPOGRAPHY.fontWeight.semibold,
-    },
-    errorText: {
-      color: COLORS.text.error,
-      fontSize: TYPOGRAPHY.fontSize.sm,
-      marginTop: SPACING[1],
-    },
-  });
-
   return (
-    <View style={styles.container}>
-
+    <LinearGradient
+      colors={[COLORS.primary, COLORS.transluscent, COLORS.transparent]}
+      style={styles.gradientContainer}>
       <View style={styles.content}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('../assets/images/pokeball.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Join the Pokémon community</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>{APP_CONSTANTS.SIGNUP_TITLE}</Text>
+          <Text style={styles.subtitle}>{APP_CONSTANTS.SIGNUP_SUBTITLE}</Text>
         </View>
 
-        <View style={styles.form}>
+        <Animated.View style={styles.form} entering={SlideInDown.delay(700)}>
+          <View style={styles.logoContainer}>
+            <ImageSelector
+              imageUri={profilePhoto}
+              onImageSelected={handleImageSelected}
+              size={120}
+              iconSize={60}
+              isLoading={isLoading}
+            />
+          </View>
           <FormInput
             control={control}
             name="email"
-            label="Email"
-            placeholder="Enter your email"
+            label={APP_CONSTANTS.EMAIL_LABEL}
+            placeholder={APP_CONSTANTS.EMAIL_PLACEHOLDER}
             keyboardType="email-address"
             autoCapitalize="none"
             error={errors.email?.message}
           />
-
           <FormInput
             control={control}
             name="password"
-            label="Password"
-            placeholder="Enter your password"
+            label={APP_CONSTANTS.PASSWORD_LABEL}
+            placeholder={APP_CONSTANTS.PASSWORD_PLACEHOLDER}
             secureTextEntry
             error={errors.password?.message}
           />
-
           <FormInput
             control={control}
             name="confirmPassword"
-            label="Confirm Password"
-            placeholder="Confirm your password"
+            label={APP_CONSTANTS.CONFIRM_PASSWORD_LABEL}
+            placeholder={APP_CONSTANTS.CONFIRM_PASSWORD_PLACEHOLDER}
             secureTextEntry
             error={errors.confirmPassword?.message}
           />
-
-          {firebaseError && (
-            <Text style={styles.errorText}>{firebaseError}</Text>
+          {signupError && (
+            <Text style={styles.errorText}>{signupError}</Text>
           )}
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleSubmit(onSubmit)}>
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.footerLink}>Sign In</Text>
-          </TouchableOpacity>
-        </View>
+          <CustomButton
+            title={APP_CONSTANTS.SIGN_UP_BUTTON}
+            onPress={handleSubmit(onSubmit)}
+            variant="primary"
+            isLoading={isLoading}
+          />
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>{APP_CONSTANTS.HAVE_ACCOUNT_TEXT}</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.footerLink}>{APP_CONSTANTS.SIGN_IN_LINK}</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
       </View>
-
-    </View>
+    </LinearGradient>
   );
 };
+
+const styles = StyleSheet.create({
+  gradientContainer: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: SPACING[5],
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginVertical: SPACING[8],
+  },
+  titleContainer: {
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: TYPOGRAPHY.fontSize['3xl'],
+    fontFamily: TYPOGRAPHY.fontFamily.bold,
+    color: COLORS.white,
+    marginBottom: SPACING[1],
+  },
+  subtitle: {
+    fontSize: TYPOGRAPHY.fontSize.base,
+    color: COLORS.white,
+  },
+  form: {
+    gap: SPACING[4],
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: SPACING[8],
+  },
+  footerText: {
+    color: COLORS.text.gray,
+    fontSize: TYPOGRAPHY.fontSize.base,
+  },
+  footerLink: {
+    color: COLORS.primary,
+    fontFamily: TYPOGRAPHY.fontFamily.semibold,
+  },
+  errorText: {
+    color: COLORS.text.error,
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    marginTop: SPACING[1],
+    textAlign: 'center',
+  },
+});
 
 export default SignupScreen;
