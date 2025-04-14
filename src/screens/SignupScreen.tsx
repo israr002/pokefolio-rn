@@ -4,41 +4,25 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import FormInput from 'components/FormInput';
-import { COLORS, TYPOGRAPHY, SPACING } from '../theme/theme';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme/theme';
 import LinearGradient from 'react-native-linear-gradient';
 import { ImageSelector } from 'components/ImageSelector';
 import CustomButton from 'components/CustomButton';
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import { getAuthErrorMessage } from 'utils/authErrors';
 import { APP_CONSTANTS } from 'constants/appConstants';
+import { signUp } from 'services/authService';
+import Toast from 'components/Toast';
+import { signupSchema } from 'schemas/authSchema';
 
-const signupSchema = z
-  .object({
-    email: z.string().email(APP_CONSTANTS.EMAIL_INVALID),
-    password: z.string().min(6, APP_CONSTANTS.PASSWORD_TOO_SHORT),
-    confirmPassword: z.string(),
-  })
-  .refine(data => data.password === data.confirmPassword, {
-    message: APP_CONSTANTS.PASSWORDS_DONT_MATCH,
-    path: ['confirmPassword'],
-  });
+
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
 const SignupScreen = ({ navigation }: any) => {
-  const [profilePhoto, setProfilePhoto] = useState<string>();
+  const [profilePhoto, setProfilePhoto] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
-  const [signupError, setSignupError] = useState<string | null>(null);
-
-  React.useEffect(() => {
-    if (signupError) {
-      const timer = setTimeout(() => {
-        setSignupError(null);
-      }, 5000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [signupError]);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const {
     control,
@@ -48,19 +32,23 @@ const SignupScreen = ({ navigation }: any) => {
     resolver: zodResolver(signupSchema),
   });
 
-  // const {signUp, firebaseError} = useAuth();
-
   const handleImageSelected = (uri: string) => setProfilePhoto(uri);
 
   const onSubmit = async (data: SignupFormData) => {
     try {
       setIsLoading(true);
-      setSignupError(null);
-      // await signUp(data.email, data.password, profilePhoto);
-      // navigation.navigate('Home');
+      const result = await signUp(data, profilePhoto);
+      if (!result.success) {
+        setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
+      } else {
+        // Navigate to email verification screen with email and password
+        navigation.navigate('EmailVerification', {
+          email: data.email,
+        });
+      }
     } catch (error: any) {
-      console.error('Signup error:', error);
-      setSignupError(getAuthErrorMessage(error));
+      console.error('Auth error:', error);
+      setToast({ message: APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -83,9 +71,16 @@ const SignupScreen = ({ navigation }: any) => {
               onImageSelected={handleImageSelected}
               size={120}
               iconSize={60}
-              isLoading={isLoading}
             />
           </View>
+          <FormInput
+            control={control}
+            name="displayName"
+            label={APP_CONSTANTS.DISPLAY_NAME_LABEL}
+            placeholder={APP_CONSTANTS.DISPLAY_NAME_PLACEHOLDER}
+            autoCapitalize="words"
+            error={errors.displayName?.message}
+          />
           <FormInput
             control={control}
             name="email"
@@ -111,9 +106,6 @@ const SignupScreen = ({ navigation }: any) => {
             secureTextEntry
             error={errors.confirmPassword?.message}
           />
-          {signupError && (
-            <Text style={styles.errorText}>{signupError}</Text>
-          )}
           <CustomButton
             title={APP_CONSTANTS.SIGN_UP_BUTTON}
             onPress={handleSubmit(onSubmit)}
@@ -128,6 +120,13 @@ const SignupScreen = ({ navigation }: any) => {
           </View>
         </Animated.View>
       </View>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onHide={() => setToast(null)}
+        />
+      )}
     </LinearGradient>
   );
 };
@@ -173,12 +172,6 @@ const styles = StyleSheet.create({
   footerLink: {
     color: COLORS.primary,
     fontFamily: TYPOGRAPHY.fontFamily.semibold,
-  },
-  errorText: {
-    color: COLORS.text.error,
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    marginTop: SPACING[1],
-    textAlign: 'center',
   },
 });
 

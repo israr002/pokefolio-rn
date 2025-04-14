@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Alert } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,7 +8,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Icon } from 'components/Icon';
 import { APP_CONSTANTS } from 'constants/appConstants';
 import Config from 'react-native-config';
-import { signInWithEmailAndPassword, signInWithGoogle } from 'services/authService';
+import { signInWithEmailAndPassword, signInWithGoogle, resendVerificationEmail } from 'services/authService';
 import { getAuthErrorMessage } from 'utils/authErrors';
 import FormInput from 'components/FormInput';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from 'theme/theme';
@@ -16,28 +16,33 @@ import CustomButton from 'components/CustomButton';
 import { authSchema, AuthFormData } from 'schemas/authSchema';
 import Animated, {
   FadeInUp,
+  SlideInDown,
 } from 'react-native-reanimated';
 import pokeball from 'assets/images/pokeball.png';
+import { EmailVerificationModal } from 'components/EmailVerificationModal';
+import auth from '@react-native-firebase/auth';
+import { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import Toast from 'components/Toast';
 
 type LoginFormData = z.infer<typeof authSchema>;
 
 const LoginScreen = ({ navigation }: any) => {
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [loginError, setLoginError] = React.useState<string | null>(null);
-  GoogleSignin.configure({
-    iosClientId: Platform.OS === "ios" ? Config.GOOGLE_IOS_CLIENT_ID : undefined,
-    webClientId: Platform.OS === "android" ? Config.GOOGLE_WEB_CLIENT_ID : undefined,
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [showVerificationModal, setShowVerificationModal] = React.useState(false);
+  const [currentEmail, setCurrentEmail] = React.useState<string>('');
+  const [isResending, setIsResending] = React.useState(false);
+  const [isEmailSent, setIsEmailSent] = React.useState(false);
 
   React.useEffect(() => {
-    if (loginError) {
+    if (toast && toast.message) {
       const timer = setTimeout(() => {
-        setLoginError(null);
+        setToast(null);
       }, 5000);
 
       return () => clearTimeout(timer);
     }
-  }, [loginError]);
+  }, [toast]);
 
   const {
     control,
@@ -50,13 +55,16 @@ const LoginScreen = ({ navigation }: any) => {
   const onSubmit = async (data: AuthFormData) => {
     try {
       setIsLoading(true);
-      setLoginError(null);
       const result = await signInWithEmailAndPassword(data.email, data.password);
       if (!result.success) {
-        setLoginError(result.error);
+        setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
+      } else if (!result.emailVerified) {
+        setCurrentEmail(data.email);
+        setShowVerificationModal(true);
       }
     } catch (error: any) {
-      setLoginError(getAuthErrorMessage(error));
+      console.error('Auth error:', error);
+      setToast({ message: APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -64,16 +72,38 @@ const LoginScreen = ({ navigation }: any) => {
 
   const handleGoogleSignIn = async () => {
     try {
-      setLoginError(null);
+      setIsLoading(true);
       const result = await signInWithGoogle();
       if (!result.success) {
-        setLoginError(result.error);
+        setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
       }
       console.log(result.user)
     } catch (error: any) {
-      setLoginError(getAuthErrorMessage(error));
+      setToast({ message: getAuthErrorMessage(error), type: 'error' });
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const handleResendVerification = async () => {
+    try {
+      setIsResending(true);
+      const result = await resendVerificationEmail();
+      if (result.success) {
+        setIsEmailSent(true);
+      } 
+    } catch (error: any) {
+      console.error(APP_CONSTANTS.AUTH_ERROR_LOG, error);
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (!showVerificationModal) {
+      setIsEmailSent(false);
+    }
+  }, [showVerificationModal]);
 
   const goToSignup = React.useCallback(() => {
     navigation.navigate('Signup');
@@ -101,39 +131,35 @@ const LoginScreen = ({ navigation }: any) => {
           </Text>
         </View>
 
-        <FormInput
-          control={control}
-          name="email"
-          label={APP_CONSTANTS.EMAIL_LABEL}
-          placeholder={APP_CONSTANTS.EMAIL_PLACEHOLDER}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          error={errors.email?.message}
-        />
-        <FormInput
-          control={control}
-          name="password"
-          label={APP_CONSTANTS.PASSWORD_LABEL}
-          placeholder={APP_CONSTANTS.PASSWORD_PLACEHOLDER}
-          secureTextEntry
-          error={errors.password?.message}
-        />
-        {loginError && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{loginError}</Text>
-          </View>
-        )}
-        <CustomButton
-          title={APP_CONSTANTS.SIGN_IN_BUTTON}
-          onPress={handleSubmit(onSubmit)}
-          variant="primary"
-          isLoading={isLoading}
-        />
-
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>OR</Text>
-          <View style={styles.dividerLine} />
+        
+          <FormInput
+            control={control}
+            name="email"
+            label={APP_CONSTANTS.EMAIL_LABEL}
+            placeholder={APP_CONSTANTS.EMAIL_PLACEHOLDER}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            error={errors.email?.message}
+          />
+          <FormInput
+            control={control}
+            name="password"
+            label={APP_CONSTANTS.PASSWORD_LABEL}
+            placeholder={APP_CONSTANTS.PASSWORD_PLACEHOLDER}
+            secureTextEntry
+            error={errors.password?.message}
+          />
+          <CustomButton
+            title={APP_CONSTANTS.SIGN_IN_BUTTON}
+            onPress={handleSubmit(onSubmit)}
+            variant="primary"
+            isLoading={isLoading}
+          />
+    
+        <View style={styles.dividerContainer}>
+          <View style={styles.divider} />
+          <Text style={styles.dividerText}>{APP_CONSTANTS.DIVIDER_TEXT}</Text>
+          <View style={styles.divider} />
         </View>
 
         <CustomButton
@@ -156,6 +182,22 @@ const LoginScreen = ({ navigation }: any) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <EmailVerificationModal
+        isVisible={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+        onResendEmail={handleResendVerification}
+        email={currentEmail}
+        isResending={isResending}
+        isEmailSent={isEmailSent}
+      />
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onHide={() => setToast(null)}
+        />
+      )}
     </LinearGradient>
   );
 };
@@ -176,6 +218,9 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
+  },
+  buttonContainer: {
+    marginTop: SPACING[4],
   },
   logo: {
     width: 120,
@@ -214,12 +259,12 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontFamily: TYPOGRAPHY.fontFamily.semibold,
   },
-  divider: {
+  dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: SPACING[4],
   },
-  dividerLine: {
+  divider: {
     flex: 1,
     height: 1,
     backgroundColor: COLORS.gray[200],

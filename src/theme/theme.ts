@@ -98,10 +98,11 @@ export const COLORS = {
 
   // Status colors
   status: {
-    success: baseColors.green[500],
-    warning: baseColors.orange[600],
-    error: baseColors.red[500],
-    errorLight: baseColors.red[500] + OPACITY.light,
+    success: '#34C759',
+    warning: '#EA580C',
+    error: '#FF3B30',
+    errorLight: 'rgba(255, 59, 48, 0.1)',
+    info: '#007AFF',
   },
 } as const;
 

@@ -26,6 +26,8 @@ export const getAuthErrorMessage = (error: FirebaseAuthTypes.NativeFirebaseAuthE
       return 'Email/password sign-in is not enabled';
     case 'auth/weak-password':
       return 'Password is too weak';
+    case 'auth/email-already-in-use':
+      return 'This email is already registered. Please try signing in or use a different email';
     default:
       return 'Unable to sign in. Please check your credentials and try again';
   }

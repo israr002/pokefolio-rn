@@ -1,8 +1,10 @@
 import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
 import { GoogleSignin, statusCodes as googleStatusCodes } from '@react-native-google-signin/google-signin';
 import { Platform, Alert } from 'react-native';
 import Config from 'react-native-config';
 import { getAuthErrorMessage } from 'utils/authErrors';
+import { SignupFormData } from 'schemas/authSchema';
 
 // Configure Google Sign In
 // Note: On iOS, we initially got the error "audience is not a valid client id"
@@ -43,10 +45,15 @@ export const showSignInWithGoogleFailed = (): void => {
 export const signInWithEmailAndPassword = async (
   email: string, 
   password: string
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<{ success: boolean; error?: string; emailVerified?: boolean; user?: any }> => {
   try {
-    await auth().signInWithEmailAndPassword(email, password);
-    return { success: true };
+    const userCredential = await auth().signInWithEmailAndPassword(email, password);
+    const isEmailVerified = userCredential.user.emailVerified;
+    return {
+      success: true,
+      emailVerified: isEmailVerified,
+      user: userCredential.user
+    };
   } catch (error: any) {
     console.error('Login error:', error);
     return { success: false, error: getAuthErrorMessage(error) };
@@ -78,6 +85,8 @@ export const signInWithGoogle = async (): Promise<{
     }
 
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+   
+    //sign in with google credential on firebase app 
     await auth().signInWithCredential(googleCredential);
     
     return { success: true, user };
@@ -89,4 +98,67 @@ export const signInWithGoogle = async (): Promise<{
     };
   }
 };
+
+export const signUp = async (
+    data: SignupFormData,
+    profilePhotoUri: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const userCredential = await auth().createUserWithEmailAndPassword(
+        data.email,
+        data.password
+      );
+  
+      const user = userCredential.user;
+      if (!user) {
+        return { success: false, error: 'User creation failed' };
+      }
+  
+      let uploadedPhotoURL = profilePhotoUri;
+  
+      // If a profile photo is provided, upload it to Firebase Storage
+      if (profilePhotoUri) {
+        const reference = storage().ref(`profile_photos/${user.uid}`);
+        await reference.putFile(profilePhotoUri);
+        uploadedPhotoURL = await reference.getDownloadURL();
+      }
+  
+      // Update the Firebase user's profile with name and photo URL
+      await user.updateProfile({
+        displayName: data.displayName,
+        ...(uploadedPhotoURL && { photoURL: uploadedPhotoURL }),
+      });
+  
+      // Send email verification
+      await user.sendEmailVerification();
+  
+   
+  
+      return { success: true };
+    } catch (error: any) {
+      console.error('Sign up error:', error);
+      return {
+        success: false,
+        error: getAuthErrorMessage(error),
+      };
+    }
+  };
+  
+
+export const resendVerificationEmail = async (): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const user = auth().currentUser;
+      if (!user) {
+        return { success: false, error: 'No user is currently signed in' };
+      }
+  
+      await user.sendEmailVerification();
+      await auth().signOut();
+      return { success: true };
+
+    } catch (error: any) {
+      console.error('Resend verification email error:', error);
+      return { success: false, error: error};
+    }
+  };
 

@@ -9,16 +9,22 @@ export const APP_CONSTANTS = {
   EMAIL_LABEL: 'Email',
   PASSWORD_LABEL: 'Password',
   CONFIRM_PASSWORD_LABEL: 'Confirm Password',
+  DISPLAY_NAME_LABEL: 'Display Name',
 
   // Form Placeholders
   EMAIL_PLACEHOLDER: 'Enter your email',
   PASSWORD_PLACEHOLDER: 'Enter your password',
   CONFIRM_PASSWORD_PLACEHOLDER: 'Confirm your password',
+  DISPLAY_NAME_PLACEHOLDER: 'Enter your display name',
 
   // Buttons
   SIGN_IN_BUTTON: 'Sign In',
   SIGN_UP_BUTTON: 'Sign Up',
   GOOGLE_SIGN_IN: 'Continue with Google',
+  RESEND_EMAIL_BUTTON: 'Resend Email',
+  CHECK_INBOX_BUTTON: 'Check Inbox',
+  VERIFY_EMAIL_BUTTON: 'I\'ve Verified My Email',
+  VERIFYING_EMAIL_BUTTON: 'Verifying...',
 
   // Links
   NO_ACCOUNT_TEXT: "Don't have an account? ",
@@ -38,6 +44,8 @@ export const APP_CONSTANTS = {
   PASSWORD_REQUIRED: 'Password is required',
   PASSWORD_TOO_SHORT: 'Password must be at least 6 characters',
   PASSWORDS_DONT_MATCH: "Passwords don't match",
+  DISPLAY_NAME_REQUIRED: 'Display name is required',
+  DISPLAY_NAME_TOO_SHORT: 'Display name must be at least 2 characters',
   INVALID_CREDENTIALS: 'Invalid email or password',
   TOO_MANY_ATTEMPTS: 'Too many failed attempts. Please try again later',
   NETWORK_ERROR: 'Please check your internet connection',
@@ -48,5 +56,16 @@ export const APP_CONSTANTS = {
   GALLERY_UNAVAILABLE: 'Gallery access is not available on this device',
   CAMERA_UNAVAILABLE: 'Camera is not available on this device',
   OPEN_SETTINGS: 'Open Settings',
+  SIGN_IN_ERROR: 'An error occurred during sign in',
+  AUTH_ERROR_LOG: 'Auth error:',
+  EMAIL_NOT_VERIFIED: 'Please verify your email before continuing.',
+
+  // Email Verification
+  VERIFY_EMAIL_TITLE: 'Verify Your Email',
+  VERIFY_EMAIL_MESSAGE: 'Please verify your email address {email} to continue.',
+  VERIFY_EMAIL_SUCCESS: 'A new verification email has been sent to your inbox. Please check your email and click the verification link.',
+
+  // UI Elements
+  DIVIDER_TEXT: 'OR',
 } as const;
 
