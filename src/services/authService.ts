@@ -5,6 +5,7 @@ import { Platform, Alert } from 'react-native';
 import Config from 'react-native-config';
 import { getAuthErrorMessage } from 'utils/authErrors';
 import { SignupFormData } from 'schemas/authSchema';
+import { APP_CONSTANTS } from 'constants/appConstants';
 
 // Configure Google Sign In
 // Note: On iOS, we initially got the error "audience is not a valid client id"
@@ -143,6 +144,21 @@ export const signUp = async (
       };
     }
   };
+
+export const checkEmailVerification = async (): Promise<boolean> => {
+  try {
+    const user = auth().currentUser;
+    if (!user) {
+      throw new Error(APP_CONSTANTS.UNKNOWN_ERROR);
+    }
+
+    await user.reload();
+    return user.emailVerified;
+  } catch (error) {
+    console.error(APP_CONSTANTS.AUTH_ERROR_LOG, error);
+    return false;
+  }
+};
   
 
 export const resendVerificationEmail = async (): Promise<{ success: boolean; error?: string }> => {

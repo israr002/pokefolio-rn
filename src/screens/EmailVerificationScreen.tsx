@@ -1,126 +1,135 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from 'theme/theme';
-import LinearGradient from 'react-native-linear-gradient';
-import CustomButton from 'components/CustomButton';
-import { APP_CONSTANTS } from 'constants/appConstants';
-import { resendVerificationEmail, signInWithEmailAndPassword } from 'services/authService';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import Toast from 'components/Toast';
+import { COLORS, TYPOGRAPHY, SPACING } from '../theme/theme';
+import { APP_CONSTANTS } from '../constants/appConstants';
+import CustomButton from 'components/CustomButton';
+import { checkEmailVerification, resendVerificationEmail } from 'services/authService';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from 'navigation/AppNavigator';
+
+type EmailVerificationScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EmailVerification'>;
 
 const EmailVerificationScreen = () => {
+  const navigation = useNavigation<EmailVerificationScreenNavigationProp>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isResending, setIsResending] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const navigation = useNavigation();
-  const route = useRoute();
-  const { email, password } = route.params as { email: string; password: string };
+  const [resendSuccess, setResendSuccess] = useState(false);
 
-  const handleResendEmail = async () => {
+  const handleCheckVerification = async () => {
     try {
-      setIsResending(true);
-      const result = await resendVerificationEmail();
-      if (!result.success) {
-        setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
+      setIsLoading(true);
+      setError(null);
+      const isVerified = await checkEmailVerification();
+      
+      if (isVerified) {
+        navigation.replace('Home');
       } else {
-        setToast({ message: APP_CONSTANTS.VERIFY_EMAIL_SUCCESS, type: 'success' });
+        setError(APP_CONSTANTS.EMAIL_NOT_VERIFIED);
       }
     } catch (error) {
-      setToast({ message: APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
+      setError(APP_CONSTANTS.UNKNOWN_ERROR);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      setIsResending(true);
+      setError(null);
+      const result = await resendVerificationEmail();
+      
+      if (result.success) {
+        setResendSuccess(true);
+        setTimeout(() => setResendSuccess(false), 3000);
+      } else if (result.error) {
+        setError(result.error);
+      }
+    } catch (error) {
+      setError(APP_CONSTANTS.UNKNOWN_ERROR);
     } finally {
       setIsResending(false);
     }
   };
 
-  const handleCheckVerification = async () => {
-    try {
-      setIsVerifying(true);
-      const result = await signInWithEmailAndPassword(email, password);
-      
-      if (!result.success) {
-        setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
-        return;
-      }
-
-      if (!result.emailVerified) {
-        setToast({ message: 'Please verify your email before continuing.', type: 'error' });
-        return;
-      }
-
-
-    } catch (error) {
-      setToast({ message: APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
-    } finally {
-      setIsVerifying(false);
-    }
-  };
+  useEffect(() => {
+    const interval = setInterval(handleCheckVerification, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <LinearGradient
-      colors={[COLORS.primary, COLORS.transluscent, COLORS.transparent]}
-      style={styles.gradientContainer}>
+    <View style={styles.container}>
       <View style={styles.content}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{APP_CONSTANTS.VERIFY_EMAIL_TITLE}</Text>
-          <Text style={styles.subtitle}>
-            {APP_CONSTANTS.VERIFY_EMAIL_MESSAGE.replace('{email}', email)}
-          </Text>
-        </View>
+        <Text style={styles.title}>{APP_CONSTANTS.VERIFY_EMAIL_TITLE}</Text>
+        <Text style={styles.subtitle}>{APP_CONSTANTS.VERIFY_EMAIL_SUBTITLE}</Text>
+        
+        {error && (
+          <Text style={styles.errorText}>{error}</Text>
+        )}
+
+        {resendSuccess && (
+          <Text style={styles.successText}>{APP_CONSTANTS.VERIFICATION_EMAIL_SENT}</Text>
+        )}
 
         <View style={styles.buttonContainer}>
           <CustomButton
-            title={isResending ? 'Sending...' : APP_CONSTANTS.RESEND_EMAIL_BUTTON}
-            onPress={handleResendEmail}
+            title={APP_CONSTANTS.RESEND_VERIFICATION_BUTTON}
+            onPress={handleResendVerification}
             variant="primary"
             isLoading={isResending}
-            disabled={isResending}
           />
           <CustomButton
-            title={isVerifying ? 'Verifying...' : 'I\'ve Verified My Email'}
+            title={APP_CONSTANTS.CHECK_VERIFICATION_BUTTON}
             onPress={handleCheckVerification}
             variant="secondary"
-            isLoading={isVerifying}
-            disabled={isVerifying}
+            isLoading={isLoading}
           />
         </View>
       </View>
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onHide={() => setToast(null)}
-        />
-      )}
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  gradientContainer: {
+  container: {
     flex: 1,
+    backgroundColor: COLORS.background.light,
+    padding: SPACING[4],
   },
   content: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: SPACING[5],
-  },
-  titleContainer: {
     alignItems: 'center',
-    marginBottom: SPACING[8],
   },
   title: {
     fontSize: TYPOGRAPHY.fontSize['3xl'],
     fontFamily: TYPOGRAPHY.fontFamily.bold,
-    color: COLORS.black,
+    color: COLORS.text.light,
+    textAlign: 'center',
     marginBottom: SPACING[2],
   },
   subtitle: {
-    fontSize: TYPOGRAPHY.fontSize.base,
-    color: COLORS.black,
+    fontSize: TYPOGRAPHY.fontSize.lg,
+    color: COLORS.text.gray,
     textAlign: 'center',
-    lineHeight: 24,
+    marginBottom: SPACING[8],
+  },
+  errorText: {
+    color: COLORS.text.error,
+    fontSize: TYPOGRAPHY.fontSize.base,
+    textAlign: 'center',
+    marginBottom: SPACING[4],
+  },
+  successText: {
+    color: COLORS.text.light,
+    fontSize: TYPOGRAPHY.fontSize.base,
+    textAlign: 'center',
+    marginBottom: SPACING[4],
   },
   buttonContainer: {
+    width: '100%',
     gap: SPACING[4],
   },
 });

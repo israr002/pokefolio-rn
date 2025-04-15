@@ -1,32 +1,26 @@
 import {z} from 'zod';
+import { APP_CONSTANTS } from '../constants/appConstants';
 
 export const authSchema = z.object({
   email: z
     .string()
-    .min(1, 'Email is required')
-    .email('Invalid email address'),
+    .min(1, APP_CONSTANTS.EMAIL_REQUIRED)
+    .email(APP_CONSTANTS.EMAIL_INVALID),
   password: z
     .string()
-    .min(1, 'Password is required')
-    .min(6, 'Password must be at least 6 characters'),
+    .min(1, APP_CONSTANTS.PASSWORD_REQUIRED)
+    .min(6, APP_CONSTANTS.PASSWORD_TOO_SHORT),
 });
 
-export const signupSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email is required')
-    .email('Invalid email address'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
+export const signupSchema = authSchema.extend({
+  confirmPassword: z.string().min(1, APP_CONSTANTS.PASSWORD_REQUIRED),
   displayName: z
     .string()
-    .min(1, 'Display name is required')
-    .min(2, 'Display name must be at least 2 characters'),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+    .min(1, APP_CONSTANTS.DISPLAY_NAME_REQUIRED)
+    .min(2, APP_CONSTANTS.DISPLAY_NAME_TOO_SHORT)
+    .regex(/^[A-Za-z\s]+$/, APP_CONSTANTS.DISPLAY_NAME_ALPHABET_ERROR),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: APP_CONSTANTS.PASSWORDS_DONT_MATCH,
   path: ['confirmPassword'],
 });
 

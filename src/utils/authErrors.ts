@@ -21,7 +21,7 @@ export const getAuthErrorMessage = (error: FirebaseAuthTypes.NativeFirebaseAuthE
     case 'auth/user-disabled':
       return 'This account has been disabled';
     case 'auth/network-request-failed':
-      return 'Please check your internet connection';
+      return 'Please check your internet connection and try again';
     case 'auth/operation-not-allowed':
       return 'Email/password sign-in is not enabled';
     case 'auth/weak-password':
