@@ -10,6 +10,9 @@ def node_require(script)
 node_require('react-native/scripts/react_native_pods.rb')
 node_require('react-native-permissions/scripts/setup.rb')
 
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
@@ -18,6 +21,7 @@ $RNFirebaseAsStaticFramework = true
 target 'pokefolio' do
  
   config = use_native_modules!
+  use_modular_headers!
 
   pod 'Firebase/Auth', :modular_headers => true
   pod 'Firebase/Core', :modular_headers => true
@@ -35,19 +39,29 @@ target 'pokefolio' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # # Explicitly specify Firebase versions
+  # pod 'Firebase', '~> 11.10.0'
+  # pod 'FirebaseCore', '~> 11.10.0'
+  # pod 'FirebaseAuth', '~> 11.10.0'
+  # pod 'FirebaseStorage', '~> 11.10.0'
+  # pod 'FirebaseCoreExtension', '~> 11.10.0'
+
+  # Permissions
   setup_permissions([
     'Camera',
     'PhotoLibrary',
     'Photos'
   ])
 
+  # ImageColors module
+  pod 'ImageColors', :path => './pokefolio/ImageColors'
+
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,
       config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
+      :mac_catalyst_enabled => false
     )
   end
 end
