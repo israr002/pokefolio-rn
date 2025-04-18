@@ -16,7 +16,7 @@ const WelcomeScreen = () => {
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
-  
+    
     if (!loading) {
       timeout = setTimeout(() => {
         if (!user) {

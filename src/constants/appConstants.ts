@@ -5,6 +5,24 @@ export const APP_CONSTANTS = {
   SIGNUP_TITLE: 'Create Account',
   SIGNUP_SUBTITLE: 'Join the Pokémon community',
 
+  // Welcome Screen
+  WELCOME_TITLE: 'Welcome to Pokefolio',
+  WELCOME_SUBTITLE: 'Your personal Pokémon collection',
+
+  // Home Screen
+  HOME_TITLE: 'Your Pokémon Collection',
+  HOME_SUBTITLE: 'Discover and collect your favorite Pokémon',
+  POKEMON_LOADING: 'Loading Pokémon...',
+  POKEMON_ERROR: 'Failed to load Pokémon. Please try again.',
+
+  // Pokemon Details
+  POKEMON_HEIGHT: 'Height',
+  POKEMON_WEIGHT: 'Weight',
+  POKEMON_ABILITIES: 'Abilities',
+  POKEMON_STATS: 'Stats',
+  POKEMON_TYPES: 'Types',
+  POKEMON_MOVES: 'Moves',
+
   // Form Labels
   EMAIL_LABEL: 'Email',
   PASSWORD_LABEL: 'Password',
@@ -47,6 +65,7 @@ export const APP_CONSTANTS = {
   PASSWORDS_DONT_MATCH: "Passwords don't match",
   DISPLAY_NAME_REQUIRED: 'Display name is required',
   DISPLAY_NAME_TOO_SHORT: 'Display name must be at least 2 characters',
+  DISPLAY_NAME_ALPHABET_ERROR: 'Display name can only contain letters and spaces',
   INVALID_CREDENTIALS: 'Invalid email or password',
   UNKNOWN_ERROR: 'An unknown error occurred',
   AUTH_ERROR_LOG: 'Authentication error:',

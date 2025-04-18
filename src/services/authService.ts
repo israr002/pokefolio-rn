@@ -1,4 +1,4 @@
-import auth from '@react-native-firebase/auth';
+import { getAuth, signInWithCredential, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
 import { GoogleSignin, statusCodes as googleStatusCodes } from '@react-native-google-signin/google-signin';
 import { Platform, Alert } from 'react-native';
@@ -6,6 +6,9 @@ import Config from 'react-native-config';
 import { getAuthErrorMessage } from 'utils/authErrors';
 import { SignupFormData } from 'schemas/authSchema';
 import { APP_CONSTANTS } from 'constants/appConstants';
+
+// Initialize Firebase Auth
+const auth = getAuth();
 
 // Configure Google Sign In
 // Note: On iOS, we initially got the error "audience is not a valid client id"
@@ -42,13 +45,12 @@ export const showSignInWithGoogleFailed = (): void => {
   );
 }
 
-
-export const signInWithEmailAndPassword = async (
+export const signInWithEmail = async (
   email: string, 
   password: string
 ): Promise<{ success: boolean; error?: string; emailVerified?: boolean; user?: any }> => {
   try {
-    const userCredential = await auth().signInWithEmailAndPassword(email, password);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const isEmailVerified = userCredential.user.emailVerified;
     return {
       success: true,
@@ -85,10 +87,8 @@ export const signInWithGoogle = async (): Promise<{
       };
     }
 
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-   
-    //sign in with google credential on firebase app 
-    await auth().signInWithCredential(googleCredential);
+    const credential = GoogleAuthProvider.credential(idToken);
+    await signInWithCredential(auth, credential);
     
     return { success: true, user };
   } catch (error: any) {
@@ -105,7 +105,8 @@ export const signUp = async (
     profilePhotoUri: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const userCredential = await auth().createUserWithEmailAndPassword(
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
         data.email,
         data.password
       );
@@ -133,8 +134,6 @@ export const signUp = async (
       // Send email verification
       await user.sendEmailVerification();
   
-   
-  
       return { success: true };
     } catch (error: any) {
       console.error('Sign up error:', error);
@@ -147,7 +146,7 @@ export const signUp = async (
 
 export const checkEmailVerification = async (): Promise<boolean> => {
   try {
-    const user = auth().currentUser;
+    const user = auth.currentUser;
     if (!user) {
       throw new Error(APP_CONSTANTS.UNKNOWN_ERROR);
     }
@@ -163,13 +162,13 @@ export const checkEmailVerification = async (): Promise<boolean> => {
 
 export const resendVerificationEmail = async (): Promise<{ success: boolean; error?: string }> => {
     try {
-      const user = auth().currentUser;
+      const user = auth.currentUser;
       if (!user) {
         return { success: false, error: 'No user is currently signed in' };
       }
   
       await user.sendEmailVerification();
-      await auth().signOut();
+      await signOut(auth);
       return { success: true };
 
     } catch (error: any) {
@@ -177,4 +176,14 @@ export const resendVerificationEmail = async (): Promise<{ success: boolean; err
       return { success: false, error: error};
     }
   };
+
+export const handleSignOut = async (): Promise<{ success: boolean; error?: string }> => {
+  try {
+    await auth.signOut();
+    return { success: true };
+  } catch (error: any) {
+    console.error('Sign out error:', error);
+    return { success: false, error: getAuthErrorMessage(error) };
+  }
+};
 

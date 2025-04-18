@@ -4,11 +4,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Icon } from 'components/Icon';
 import { APP_CONSTANTS } from 'constants/appConstants';
-import Config from 'react-native-config';
-import { signInWithEmailAndPassword, signInWithGoogle, resendVerificationEmail } from 'services/authService';
+import { signInWithEmail, signInWithGoogle, resendVerificationEmail } from 'services/authService';
 import { getAuthErrorMessage } from 'utils/authErrors';
 import FormInput from 'components/FormInput';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from 'theme/theme';
@@ -27,7 +25,8 @@ import Toast from 'components/Toast';
 type LoginFormData = z.infer<typeof authSchema>;
 
 const LoginScreen = ({ navigation }: any) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [showVerificationModal, setShowVerificationModal] = React.useState(false);
   const [currentEmail, setCurrentEmail] = React.useState<string>('');
@@ -54,34 +53,37 @@ const LoginScreen = ({ navigation }: any) => {
 
   const onSubmit = async (data: AuthFormData) => {
     try {
-      setIsLoading(true);
-      const result = await signInWithEmailAndPassword(data.email, data.password);
+      setIsEmailLoading(true);
+      const result = await signInWithEmail(data.email, data.password);
       if (!result.success) {
         setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
       } else if (!result.emailVerified) {
         setCurrentEmail(data.email);
         setShowVerificationModal(true);
+      }else{
+        navigation.navigate('Home');
       }
     } catch (error: any) {
       console.error('Auth error:', error);
       setToast({ message: APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
     } finally {
-      setIsLoading(false);
+      setIsEmailLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
     try {
-      setIsLoading(true);
+      setIsGoogleLoading(true);
       const result = await signInWithGoogle();
       if (!result.success) {
         setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
       }
       console.log(result.user)
+      navigation.navigate('Home');
     } catch (error: any) {
       setToast({ message: getAuthErrorMessage(error), type: 'error' });
     } finally {
-      setIsLoading(false);
+      setIsGoogleLoading(false);
     }
   };
 
@@ -153,7 +155,8 @@ const LoginScreen = ({ navigation }: any) => {
             title={APP_CONSTANTS.SIGN_IN_BUTTON}
             onPress={handleSubmit(onSubmit)}
             variant="primary"
-            isLoading={isLoading}
+            isLoading={isEmailLoading}
+            disabled={isEmailLoading}
           />
     
         <View style={styles.dividerContainer}>
@@ -166,6 +169,7 @@ const LoginScreen = ({ navigation }: any) => {
           title={APP_CONSTANTS.GOOGLE_SIGN_IN}
           onPress={handleGoogleSignIn}
           variant="secondary"
+          disabled={isGoogleLoading}
           icon={
             <Icon
               name="google-signin"
