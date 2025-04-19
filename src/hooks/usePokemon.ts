@@ -29,6 +29,7 @@ export const usePokemonDetails = (id: string) => {
   return useQuery<PokemonDetails, Error>({
     queryKey: ['pokemon', 'details', id],
     queryFn: () => pokemonApi.getPokemonDetails(id),
+    enabled: !!id, 
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error: any) => {
       if (

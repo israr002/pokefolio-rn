@@ -7,6 +7,7 @@ import SignupScreen from 'screens/SignupScreen';
 import EmailVerificationScreen from 'screens/EmailVerificationScreen';
 import HomeScreen from 'screens/HomeScreen';
 import WelcomeScreen from 'screens/WelcomeScreen';
+import PokemonDetailScreen from 'screens/PokemonDetailScreen';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -53,6 +54,7 @@ const AppNavigator = () => {
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="EmailVerification" component={EmailVerificationScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="PokemonDetail"  component={PokemonDetailScreen} />
         </Stack.Navigator>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>

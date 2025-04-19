@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import FastImage from '@d11/react-native-fast-image';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from 'theme/theme';
-import { getPokemonIdFromUrl, getPokemonImageUrl } from 'utils/pokemon';
+import { formatPokemonId, getPokemonIdFromUrl, getPokemonImageUrl } from 'utils/pokemon';
 
 interface PokemonCardProps {
   pokemon: { name: string; url: string };
@@ -16,11 +16,10 @@ const PokemonCard = ({ pokemon, onPress, bgColor }: PokemonCardProps) => {
 
   const handlePress = useCallback(() => {
     onPress(pokemon);
+    console.log("bgColor 123", pokemon.bgColor)
   }, [onPress, pokemon]);
 
-  const formatPokemonId = useCallback((id: string | number): string => {
-    return `#${id.toString().padStart(3, '0')}`;
-  }, []);
+
 console.log("bgColor", bgColor)
   return (
     <TouchableOpacity

@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   ActivityIndicator,
-  Animated,
+  TouchableOpacity,
 } from 'react-native';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -20,9 +20,10 @@ import {
 } from '../theme/theme';
 import CustomButton from './CustomButton';
 import { usePokemonDetails } from '../hooks/usePokemon';
-import { getPokemonImageUrl } from 'utils/pokemon';
+import { getPokemonIdFromUrl, getPokemonImageUrl } from 'utils/pokemon';
 import LinearGradient from 'react-native-linear-gradient';
-import { colors } from 'react-native-keyboard-controller/lib/typescript/components/KeyboardToolbar/colors';
+import FastImage from '@d11/react-native-fast-image';
+import { Pokemon } from 'types/pokemon';
 
 interface PokemonType {
   type: {
@@ -30,67 +31,39 @@ interface PokemonType {
   };
 }
 
-interface PokemonBottomSheetProps {
-  bottomSheetRef: React.RefObject<BottomSheetModal>;
-  pokemon: { name: string; url: string };
+interface PokemonWithColor {
+  name: string;
+  url: string;
+  bgColor?: string;
 }
 
-const PokemonBottomSheet: React.FC<PokemonBottomSheetProps> = ({
-  bottomSheetRef,
-  pokemon,
-}) => {
+export interface PokemonBottomSheetRef {
+  present: (pokemon: PokemonWithColor) => void;
+}
+
+const PokemonBottomSheet = forwardRef<PokemonBottomSheetRef>((_, ref) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const pokemonId = pokemon.url.split('/').slice(-2, -1)[0];
+  const [selectedPokemon, setSelectedPokemon] = useState<PokemonWithColor | null>(null);
+  const [pokemonId, setPokemonId] = useState<string>('');
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+
   const { data: pokemonDetails, isLoading } = usePokemonDetails(pokemonId);
 
-  const imageScale = useRef(new Animated.Value(0)).current;
-  const heightValue = useRef(new Animated.Value(0)).current;
-  const weightValue = useRef(new Animated.Value(0)).current;
-
-  const [heightDisplay, setHeightDisplay] = useState('0.0');
-  const [weightDisplay, setWeightDisplay] = useState('0.0');
-
-  useEffect(() => {
-    if (pokemonDetails) {
-      Animated.spring(imageScale, {
-        toValue: 1,
-        useNativeDriver: true,
-        damping: 8,
-        mass: 0.5,
-      }).start();
-
-      Animated.timing(heightValue, {
-        toValue: pokemonDetails.height / 10,
-        duration: 1000,
-        useNativeDriver: false,
-      }).start();
-
-      Animated.timing(weightValue, {
-        toValue: pokemonDetails.weight / 10,
-        duration: 1000,
-        useNativeDriver: false,
-      }).start();
-
-      const heightListener = heightValue.addListener(({ value }) => {
-        setHeightDisplay(value.toFixed(1));
-      });
-      const weightListener = weightValue.addListener(({ value }) => {
-        setWeightDisplay(value.toFixed(1));
-      });
-
-      return () => {
-        heightValue.removeListener(heightListener);
-        weightValue.removeListener(weightListener);
-      };
-    }
-  }, [pokemonDetails]);
-
-  if (!pokemon || !pokemonDetails) return null;
+  useImperativeHandle(ref, () => ({
+    present: (pokemon: PokemonWithColor) => {
+      const id = getPokemonIdFromUrl(pokemon.url);
+      setPokemonId(id);
+      setSelectedPokemon(pokemon);
+      bottomSheetRef.current?.present();
+    },
+  }));
 
   const handleViewDetails = () => {
     bottomSheetRef.current?.dismiss();
-    navigation.navigate('PokemonDetail', { pokemon: pokemonDetails });
+    if (pokemonDetails) {
+      navigation.navigate('PokemonDetail', { pokemon: pokemonDetails });
+    }
   };
 
   const getTypeGradient = (typeName: keyof typeof TYPE_COLORS) => {
@@ -102,7 +75,6 @@ const PokemonBottomSheet: React.FC<PokemonBottomSheetProps> = ({
     const typeName = typeInfo.type.name;
     return (
       <View key={index}>
-        {/* <View style={styles.pokeballShadow} /> */}
         <View style={[styles.typeBadge, { backgroundColor: TYPE_COLORS[typeName] }]}>
           <Text style={styles.typeText}>{typeName}</Text>
         </View>
@@ -110,53 +82,60 @@ const PokemonBottomSheet: React.FC<PokemonBottomSheetProps> = ({
     );
   };
 
+  const renderBackdrop = (props: any) => (
+    <BottomSheetBackdrop
+      {...props}
+      disappearsOnIndex={-1}
+      appearsOnIndex={0}
+    />
+  );
+
   return (
     <BottomSheetModal
       ref={bottomSheetRef}
       snapPoints={['50%']}
       backgroundStyle={styles.bottomSheetBackground}
-      animationConfigs={{ duration: 300 }}
+      backdropComponent={renderBackdrop}
+      enableDynamicSizing={false}
+      enableContentPanningGesture={false}
     >
-      {isLoading ? (
+      {isLoading || !pokemonDetails ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       ) : (
         <BottomSheetView style={styles.bottomSheetContent}>
           <LinearGradient
-            colors={getTypeGradient(pokemonDetails.types[0].type.name)}
+            colors={[selectedPokemon?.bgColor || COLORS.primary, COLORS.white]}
             style={styles.imageGradient}
           >
-            <Animated.View
-              style={[styles.imageContainer, { transform: [{ scale: imageScale }] }]}
-            >
+            <View style={styles.imageContainer}>
               <View style={styles.nameContainer}>
                 <View>
                   <Text style={styles.name}>{pokemonDetails.name}</Text>
                   <View style={styles.typesContainer}>
-                    {pokemonDetails.types.map(renderTypeBadge)}
+                    {/* {pokemonDetails.types.map(renderTypeBadge)} */}
                   </View>
                 </View>
-                <Image
-                  source={{ uri: getPokemonImageUrl(pokemonDetails.id) }}
-                  style={styles.image}
-                  resizeMode="contain"
-                />
+
+                  <FastImage
+         source={{ uri: getPokemonImageUrl(pokemonDetails.id) }}
+         style={styles.image}
+        resizeMode={FastImage.resizeMode.contain}
+      />
               </View>
 
               <View style={styles.detailsContainer}>
                 <View style={styles.statsContainer}>
                   <View style={styles.statItem}>
                     <Text style={styles.statLabel}>Height</Text>
-                    <Text style={styles.statValue}>{heightDisplay} m</Text>
+                    <Text style={styles.statValue}>{(pokemonDetails.height / 10).toFixed(1)} m</Text>
                   </View>
                   <View style={styles.statItem}>
                     <Text style={styles.statLabel}>Weight</Text>
-                    <Text style={styles.statValue}>{weightDisplay} kg</Text>
+                    <Text style={styles.statValue}>{(pokemonDetails.weight / 10).toFixed(1)} kg</Text>
                   </View>
                 </View>
-
-
               </View>
 
               <View style={styles.buttonContainer}>
@@ -166,13 +145,13 @@ const PokemonBottomSheet: React.FC<PokemonBottomSheetProps> = ({
                   variant="primary"
                 />
               </View>
-            </Animated.View>
+            </View>
           </LinearGradient>
         </BottomSheetView>
       )}
     </BottomSheetModal>
   );
-};
+});
 
 const styles = StyleSheet.create({
   bottomSheetBackground: {
@@ -212,28 +191,16 @@ const styles = StyleSheet.create({
     width: 170,
     height: 170,
     alignSelf: 'flex-end',
-    //position: 'absolute',
-    //right: 10,
   },
   name: {
     fontSize: TYPOGRAPHY.fontSize['4xl'],
     fontWeight: TYPOGRAPHY.fontWeight.bold,
     color: COLORS.white,
     textTransform: 'capitalize',
-    //marginTop: -SPACING[12],
-    //marginLeft: SPACING[2],
-    //position: 'absolute',
-    //bottom: 30,
-    //left: 30,
   },
   detailsContainer: {
     paddingHorizontal: SPACING[3],
-    //backgroundColor: COLORS.transluscent,
-    //borderRadius: BORDER_RADIUS.base,
-    //padding: SPACING[2],
     margin: SPACING[2],
-    //borderWidth: 1,
-    //borderColor: COLORS.white
   },
   statsContainer: {
     flexDirection: 'row',
@@ -246,7 +213,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: TYPOGRAPHY.fontSize.sm,
-    color: COLORS.gray,
+    color: COLORS.white,
     marginBottom: SPACING[1],
   },
   statValue: {
@@ -256,26 +223,13 @@ const styles = StyleSheet.create({
   },
   typesContainer: {
     flexDirection: 'row',
-    //justifyContent: 'center',
     marginTop: SPACING[2],
-    // flexWrap: 'wrap',
     gap: SPACING[2],
-  },
-  pokeballShadow: {
-    position: 'absolute',
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    right: -8,
-    top: -8,
-    transform: [{ rotate: '45deg' }],
   },
   typeBadge: {
     paddingHorizontal: SPACING[4],
     paddingVertical: SPACING[1],
     borderRadius: BORDER_RADIUS.full,
-    //minWidth: 80,
     alignItems: 'center',
     backgroundColor: COLORS.primary,
     borderWidth: 1,

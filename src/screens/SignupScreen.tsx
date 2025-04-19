@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import FormInput from 'components/FormInput';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme/theme';
 import LinearGradient from 'react-native-linear-gradient';
 import { ImageSelector } from 'components/ImageSelector';
 import CustomButton from 'components/CustomButton';
 import Animated, { SlideInDown } from 'react-native-reanimated';
-import { getAuthErrorMessage } from 'utils/authErrors';
 import { APP_CONSTANTS } from 'constants/appConstants';
 import { signUp } from 'services/authService';
 import Toast from 'components/Toast';
@@ -37,7 +35,6 @@ const SignupScreen = ({ navigation }: any) => {
       if (!result.success) {
         setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
       } else {
-        // Navigate to email verification screen with email and password
         navigation.navigate('EmailVerification', {
           email: data.email,
           password: data.password,

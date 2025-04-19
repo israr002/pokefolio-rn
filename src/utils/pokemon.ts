@@ -10,3 +10,6 @@ export const getPokemonIdFromUrl = (url: string): string => {
     return `${IMAGE.POKEMON_SPRITE_BASE_URL}/${pokemonId}.png`;
   };
   
+  export const formatPokemonId = (id: string | number): string => {
+    return `#${id.toString().padStart(3, '0')}`;
+  };
