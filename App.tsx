@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import {  StatusBar, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
@@ -7,6 +7,7 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { COLORS } from 'theme/theme';
 import { AuthProvider } from 'contexts/AuthContext';
 import { MMKV } from 'react-native-mmkv';
+import { SafeAreaProvider,SafeAreaView } from 'react-native-safe-area-context';
 
 // Create MMKV instance for React Query persistence
 const mmkv = new MMKV({
@@ -51,13 +52,23 @@ persistQueryClient({
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <SafeAreaView style={styles.safeArea}>
-        <AuthProvider>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
-        </AuthProvider>
-      </SafeAreaView>
+      {/* <View style={{ flex: 1, backgroundColor: COLORS.primary }}>
+        <SafeAreaView style={{ flex: 1 }}> */}
+        <SafeAreaProvider>
+          {/* <SafeAreaView style={{flex:1,backgroundColor:'red'}}> */}
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor={COLORS.primary} // Only affects Android
+          />
+          <AuthProvider>
+            <NavigationContainer>
+              <AppNavigator />
+            </NavigationContainer>
+          </AuthProvider>
+          {/* </SafeAreaView> */}
+          </SafeAreaProvider>
+        {/* </SafeAreaView>
+      </View> */}
     </QueryClientProvider>
   );
 };

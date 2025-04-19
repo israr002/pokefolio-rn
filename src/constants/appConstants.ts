@@ -1,19 +1,20 @@
 export const APP_CONSTANTS = {
   // Auth Screen Titles
   LOGIN_TITLE: 'Welcome Back',
-  LOGIN_SUBTITLE: 'Sign in to continue your Pokémon journey',
+  LOGIN_SUBTITLE: 'Sign in to continue your Pokemon journey',
   SIGNUP_TITLE: 'Create Account',
   SIGNUP_SUBTITLE: 'Join the Pokémon community',
 
   // Welcome Screen
   WELCOME_TITLE: 'Welcome to Pokefolio',
-  WELCOME_SUBTITLE: 'Your personal Pokémon collection',
+  WELCOME_SUBTITLE: 'Your personal Pokemon collection',
 
   // Home Screen
   HOME_TITLE: 'Your Pokémon Collection',
   HOME_SUBTITLE: 'Discover and collect your favorite Pokémon',
   POKEMON_LOADING: 'Loading Pokémon...',
   POKEMON_ERROR: 'Failed to load Pokémon. Please try again.',
+  WELCOME: 'welcome',
 
   // Pokemon Details
   POKEMON_HEIGHT: 'Height',

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		130AD2C82DABE74C000577D2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 130AD2C72DABE74C000577D2 /* GoogleService-Info.plist */; };
+		135684742DB381B600CFD02C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 135684732DB381B600CFD02C /* GoogleService-Info.plist */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		47935835546924F2041C4604 /* Pods_pokefolio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0AA0685D50129D7A451EDDB /* Pods_pokefolio.framework */; };
 		545939E4F5C3FC5E91EACB66 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
@@ -17,6 +18,7 @@
 
 /* Begin PBXFileReference section */
 		130AD2C72DABE74C000577D2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		135684732DB381B600CFD02C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* pokefolio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pokefolio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = pokefolio/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = pokefolio/Info.plist; sourceTree = "<group>"; };
@@ -73,6 +75,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				135684732DB381B600CFD02C /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* pokefolio */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -164,6 +167,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				130AD2C82DABE74C000577D2 /* GoogleService-Info.plist in Resources */,
+				135684742DB381B600CFD02C /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				545939E4F5C3FC5E91EACB66 /* PrivacyInfo.xcprivacy in Resources */,
 			);

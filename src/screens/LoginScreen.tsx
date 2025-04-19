@@ -14,12 +14,9 @@ import CustomButton from 'components/CustomButton';
 import { authSchema, AuthFormData } from 'schemas/authSchema';
 import Animated, {
   FadeInUp,
-  SlideInDown,
 } from 'react-native-reanimated';
 import pokeball from 'assets/images/pokeball.png';
 import { EmailVerificationModal } from 'components/EmailVerificationModal';
-import auth from '@react-native-firebase/auth';
-import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import Toast from 'components/Toast';
 
 type LoginFormData = z.infer<typeof authSchema>;

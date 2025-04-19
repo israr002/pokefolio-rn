@@ -69,18 +69,18 @@ const styles = StyleSheet.create({
   textContainer: {
     zIndex: 3,
     position: 'relative',
-    justifyContent: 'center',
+    paddingTop : SPACING[2],
     flex: 1,
   },
   number: {
     fontSize: TYPOGRAPHY.fontSize.sm,
-    fontWeight: TYPOGRAPHY.fontWeight.bold,
+    fontWeight: TYPOGRAPHY.fontWeight.semibold,
     color: COLORS.text.light,
     textAlign: 'center',
   },
   name: {
-    fontSize: TYPOGRAPHY.fontSize.lg,
-    fontWeight: '700',
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontWeight: TYPOGRAPHY.fontWeight.semibold,
     color: COLORS.text.light,
     textTransform: 'capitalize',
     marginBottom: SPACING[1],

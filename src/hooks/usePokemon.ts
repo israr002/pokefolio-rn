@@ -1,4 +1,4 @@
-import { useInfiniteQuery} from '@tanstack/react-query';
+import { useQuery,useInfiniteQuery} from '@tanstack/react-query';
 import { pokemonApi } from 'api/pokemonApi';
 import { API } from 'constants/config';
 
@@ -19,6 +19,23 @@ export const usePokemonList = (limit: number = API.POKEMON_PER_PAGE) => {
         error.message === 'Request timeout'
       ) {
         return failureCount < API.RETRY_ATTEMPTS;
+      }
+      return false;
+    },
+  });
+};
+
+export const usePokemonDetails = (id: string) => {
+  return useQuery<PokemonDetails, Error>({
+    queryKey: ['pokemon', 'details', id],
+    queryFn: () => pokemonApi.getPokemonDetails(id),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error: any) => {
+      if (
+        error.message === 'No internet connection' ||
+        error.message === 'Request timeout'
+      ) {
+        return failureCount < 3;
       }
       return false;
     },

@@ -8,6 +8,7 @@ Pod::Spec.new do |s|
   s.summary      = "Image color extraction for React Native"
   s.homepage     = "https://github.com/israr002/pokefolio-rn"
   s.license      = "MIT"
+  s.author       = { "Israr khan" => "israr002@gmail.com" } #
   s.platform     = :ios, "11.0"
   s.source       = { :git => "https://github.com/israr002/pokefolio-rn.git", :tag => "#{s.version}" }
   s.source_files = "*.{h,m,swift}"

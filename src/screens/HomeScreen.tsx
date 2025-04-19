@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useEffect, useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -18,6 +18,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getPokemonIdFromUrl, getPokemonImageUrl } from 'utils/pokemon';
 import { PokemonStorage } from 'utils/storage';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import PokemonBottomSheet from 'components/PokemonBottomSheet';
 
 const { ImageColors } = NativeModules;
 
@@ -37,7 +39,11 @@ interface Pokemon {
 const HomeScreen: React.FC = () => {
   const { data, isLoading, fetchNextPage, isFetchingNextPage } = usePokemonList();
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
+  const [selectedPokemon, setSelectedPokemon] = React.useState<Pokemon | null>(
+    null,
+  );
 
   const rawList = useMemo(() => {
     return data?.pages?.flatMap((page: PokemonListResponse) => page.results) ?? [];
@@ -78,9 +84,13 @@ const HomeScreen: React.FC = () => {
     loadPokemonWithColors();
   }, [rawList]);
 
-  const handlePokemonPress = useCallback((pokemon: Pokemon) => {
-    console.log('Pokemon pressed:', pokemon);
-  }, []);
+  const handlePokemonPress = useCallback(
+    async (pokemon: {name: string; url: string}) => {
+      await setSelectedPokemon(pokemon);
+      bottomSheetRef.current?.present();
+    },
+    [],
+  );
 
   const handleLogout = useCallback(async () => {
     try {
@@ -134,6 +144,12 @@ const HomeScreen: React.FC = () => {
             drawDistance={5}
             ListFooterComponent={renderFooter}
           />
+              {selectedPokemon && (
+        <PokemonBottomSheet
+          bottomSheetRef={bottomSheetRef}
+          pokemon={selectedPokemon}
+        />
+      )}
         </View>
       </View>
     </LinearGradient>

@@ -1,6 +1,7 @@
 export const API_ENDPOINTS = {
   POKEMON: {
     LIST: '/pokemon',
+    DETAILS: (nameOrId: string | number) => `/pokemon/${nameOrId}`,
   },
 } as const;
 
