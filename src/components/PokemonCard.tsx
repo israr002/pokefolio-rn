@@ -1,26 +1,53 @@
-import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image ,NativeModules} from 'react-native';
 import FastImage from '@d11/react-native-fast-image';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from 'theme/theme';
 import { formatPokemonId, getPokemonIdFromUrl, getPokemonImageUrl } from 'utils/pokemon';
+import { PokemonStorage } from 'utils/storage';
+
+const { ImageColors } = NativeModules;
 
 interface PokemonCardProps {
   pokemon: { name: string; url: string };
-  onPress: (pokemon: { name: string; url: string }) => void;
-  bgColor: string;
+  onPress: (pokemon: { name: string; url: string; bgColor: string }) => void;
 }
 
-const PokemonCard = ({ pokemon, onPress, bgColor }: PokemonCardProps) => {
+const PokemonCard = ({ pokemon, onPress }: PokemonCardProps) => {
+  const [bgColor, setBgColor] = useState<string>(COLORS.white);
   const pokemonId = getPokemonIdFromUrl(pokemon.url);
   const pokemonPicture = getPokemonImageUrl(pokemonId);
 
+  useEffect(() => {
+    const loadColor = async () => {
+      const cachedColor = PokemonStorage.getPokemonColor(pokemon.name);
+      if (cachedColor) {
+        setBgColor(cachedColor);
+        return;
+      }
+
+      try {
+        const color = await ImageColors.getColors(pokemonPicture, COLORS.white);
+        if (color) {
+          PokemonStorage.setPokemonColor(pokemon.name, color);
+          setBgColor(color);
+        } else {
+          PokemonStorage.setPokemonColor(pokemon.name, COLORS.white);
+          setBgColor(COLORS.white);
+        }
+      } catch (error) {
+        console.error('Error getting colors:', error);
+        PokemonStorage.setPokemonColor(pokemon.name, COLORS.white);
+        setBgColor(COLORS.white);
+      }
+    };
+
+    loadColor();
+  }, [pokemon.name, pokemonPicture]);
+
   const handlePress = useCallback(() => {
-    onPress(pokemon);
-    console.log("bgColor 123", pokemon.bgColor)
-  }, [onPress, pokemon]);
+    onPress({ ...pokemon, bgColor });
+  }, [onPress, pokemon, bgColor]);
 
-
-console.log("bgColor", bgColor)
   return (
     <TouchableOpacity
       style={[styles.container, { backgroundColor: bgColor }]}
@@ -33,17 +60,21 @@ console.log("bgColor", bgColor)
         </View>
       </View>
 
-      <FastImage
+      <Image
         source={require('assets/images/pokeball.png')}
         style={styles.pokeball}
-        resizeMode={FastImage.resizeMode.contain}
         tintColor="white"
       />
 
       <FastImage
-        source={{ uri: pokemonPicture }}
+        source={{
+          uri: pokemonPicture,
+          priority: FastImage.priority.high,
+          cache: FastImage.cacheControl.immutable
+        }}
         style={styles.pokemonImage}
         resizeMode={FastImage.resizeMode.contain}
+
       />
     </TouchableOpacity>
   );
@@ -52,14 +83,12 @@ console.log("bgColor", bgColor)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginVertical: SPACING[1],
-    marginHorizontal: SPACING[2],
-    flexDirection: 'row',
-    borderRadius: BORDER_RADIUS.base,
-    justifyContent: 'space-between',
+    paddingHorizontal: SPACING[2],
+    margin: SPACING[1.5],
     height: 100,
-    paddingHorizontal: SPACING[3],
-    shadowColor: '#000',
+    borderRadius: BORDER_RADIUS.base,
+    overflow: 'hidden',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
@@ -68,7 +97,7 @@ const styles = StyleSheet.create({
   textContainer: {
     zIndex: 3,
     position: 'relative',
-    paddingTop : SPACING[2],
+    paddingTop: SPACING[2],
     flex: 1,
   },
   number: {
@@ -116,4 +145,3 @@ const styles = StyleSheet.create({
 });
 
 export default PokemonCard;
-

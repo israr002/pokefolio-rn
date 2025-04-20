@@ -1,6 +1,7 @@
-import { useQuery,useInfiniteQuery} from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { pokemonApi } from 'api/pokemonApi';
 import { API } from 'constants/config';
+import { PokemonDetails } from 'types/pokemon';
 
 export const usePokemonList = (limit: number = API.POKEMON_PER_PAGE) => {
   return useInfiniteQuery({

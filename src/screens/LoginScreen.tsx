@@ -72,11 +72,11 @@ const LoginScreen = ({ navigation }: any) => {
     try {
       setIsGoogleLoading(true);
       const result = await signInWithGoogle();
-      if (!result.success) {
+      if (result.success) {
+        navigation.navigate('Home');
+      } else {
         setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
       }
-      console.log(result.user)
-      navigation.navigate('Home');
     } catch (error: any) {
       setToast({ message: getAuthErrorMessage(error), type: 'error' });
     } finally {

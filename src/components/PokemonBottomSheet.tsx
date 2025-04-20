@@ -23,7 +23,7 @@ import { usePokemonDetails } from '../hooks/usePokemon';
 import { getPokemonIdFromUrl, getPokemonImageUrl } from 'utils/pokemon';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from '@d11/react-native-fast-image';
-import { Pokemon } from 'types/pokemon';
+import { PokemonDetails } from 'types/pokemon';
 
 interface PokemonType {
   type: {
@@ -34,7 +34,7 @@ interface PokemonType {
 interface PokemonWithColor {
   name: string;
   url: string;
-  bgColor?: string;
+  bgColor: string;
 }
 
 export interface PokemonBottomSheetRef {
@@ -66,18 +66,11 @@ const PokemonBottomSheet = forwardRef<PokemonBottomSheetRef>((_, ref) => {
     }
   };
 
-  const getTypeGradient = (typeName: keyof typeof TYPE_COLORS) => {
-    const baseColor = TYPE_COLORS[typeName];
-    return [baseColor, COLORS.white];
-  };
-
   const renderTypeBadge = (typeInfo: PokemonType, index: number) => {
     const typeName = typeInfo.type.name;
     return (
-      <View key={index}>
-        <View style={[styles.typeBadge, { backgroundColor: TYPE_COLORS[typeName] }]}>
-          <Text style={styles.typeText}>{typeName}</Text>
-        </View>
+      <View key={index} style={[styles.typeBadge, { backgroundColor: TYPE_COLORS[typeName] }]}>
+        <Text style={styles.typeText}>{typeName}</Text>
       </View>
     );
   };
@@ -114,15 +107,15 @@ const PokemonBottomSheet = forwardRef<PokemonBottomSheetRef>((_, ref) => {
                 <View>
                   <Text style={styles.name}>{pokemonDetails.name}</Text>
                   <View style={styles.typesContainer}>
-                    {/* {pokemonDetails.types.map(renderTypeBadge)} */}
+                    {pokemonDetails.types.map(renderTypeBadge)}
                   </View>
                 </View>
 
-                  <FastImage
-         source={{ uri: getPokemonImageUrl(pokemonDetails.id) }}
-         style={styles.image}
-        resizeMode={FastImage.resizeMode.contain}
-      />
+                <FastImage
+                  source={{ uri: getPokemonImageUrl(pokemonDetails.id) }}
+                  style={styles.image}
+                  resizeMode={FastImage.resizeMode.contain}
+                />
               </View>
 
               <View style={styles.detailsContainer}>
@@ -231,7 +224,6 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING[1],
     borderRadius: BORDER_RADIUS.full,
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
     borderWidth: 1,
     borderColor: COLORS.white,
     shadowColor: COLORS.black,

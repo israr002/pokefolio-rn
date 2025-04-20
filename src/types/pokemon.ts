@@ -59,6 +59,13 @@ export interface PokemonDetails {
   };
   types: {
     type: {
+      name: keyof typeof TYPE_COLORS;
+    };
+  }[];
+  height: number;
+  weight: number;
+  abilities: {
+    ability: {
       name: string;
     };
   }[];
@@ -68,4 +75,7 @@ export interface PokemonDetails {
       name: string;
     };
   }[];
+  species: {
+    flavor_text: string;
+  };
 }

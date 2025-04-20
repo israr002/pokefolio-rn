@@ -1,9 +1,8 @@
-import React, { useCallback, useMemo, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   View,
   StyleSheet,
   ActivityIndicator,
-  NativeModules,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { usePokemonList } from 'hooks/usePokemon';
@@ -15,14 +14,10 @@ import LinearGradient from 'react-native-linear-gradient';
 import { handleSignOut } from 'services/authService';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { getPokemonIdFromUrl, getPokemonImageUrl } from 'utils/pokemon';
-import { PokemonStorage } from 'utils/storage';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import PokemonBottomSheet from 'components/PokemonBottomSheet';
-import { NativeViewGestureHandler } from 'react-native-gesture-handler';
+import Footer from 'components/Footer';
 import { showLocalNotification } from 'services/notificationService';
-
-const { ImageColors } = NativeModules;
 
 type RootStackParamList = {
   Login: undefined;
@@ -41,65 +36,25 @@ const HomeScreen: React.FC = () => {
   const { data, isLoading, fetchNextPage, isFetchingNextPage } = usePokemonList();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
-
 
   useEffect(() => {
     const run = async () => {
-      console.log("====>in local notification")
+      console.log("====>in local notification");
       await showLocalNotification('🚀 Demo', 'Notification fired automatically!');
     };
     setTimeout(() => {
       run();
     }, 1000);
   }, []);
+  console.log("====>data", data);
 
-  const rawList = useMemo(() => {
+  const pokemonList = useMemo(() => {
     return data?.pages?.flatMap((page: PokemonListResponse) => page.results) ?? [];
   }, [data]);
 
-  useEffect(() => {
-    const loadPokemonWithColors = async () => {
-      const updatedList = await Promise.all(
-        rawList.map(async (pokemon) => {
-          const cachedColor = PokemonStorage.getPokemonColor(pokemon.name);
-          if (cachedColor) {
-            return { ...pokemon, bgColor: cachedColor };
-          }
-
-          const id = getPokemonIdFromUrl(pokemon.url);
-          const image = getPokemonImageUrl(id);
-
-          try {
-            const color = await ImageColors.getColors(image, COLORS.white);
-            if (color) {
-              PokemonStorage.setPokemonColor(pokemon.name, color);
-              return { ...pokemon, bgColor: color };
-            }
-            // If no color is returned, use a default color
-            PokemonStorage.setPokemonColor(pokemon.name, COLORS.white);
-            return { ...pokemon, bgColor: COLORS.white };
-          } catch (error) {
-            console.error('Error getting colors:', error);
-            // Use a default color on error
-            PokemonStorage.setPokemonColor(pokemon.name, COLORS.white);
-            return { ...pokemon, bgColor: COLORS.white };
-          }
-        })
-      );
-      setPokemonList(updatedList);
-    };
-
-    loadPokemonWithColors();
-  }, [rawList]);
-
-  const handlePokemonPress = useCallback((pokemon: { name: string; url: string }) => {
-    const pokemonWithColor = {
-      ...pokemon,
-      bgColor: pokemonList.find(p => p.name === pokemon.name)?.bgColor || COLORS.primary
-    };
-    bottomSheetRef.current?.present(pokemonWithColor);
-  }, [pokemonList]);
+  const handlePokemonPress = useCallback((pokemon: Pokemon) => {
+    bottomSheetRef.current?.present(pokemon);
+  }, []);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -113,13 +68,10 @@ const HomeScreen: React.FC = () => {
   }, [navigation]);
 
   const renderItem = useCallback(({ item }: { item: Pokemon }) => {
-    if (!item.bgColor) return null;
-
     return (
       <PokemonCard
         pokemon={{ name: item.name, url: item.url }}
         onPress={handlePokemonPress}
-        bgColor={item.bgColor}
       />
     );
   }, [handlePokemonPress]);
@@ -135,7 +87,6 @@ const HomeScreen: React.FC = () => {
   }, [isFetchingNextPage, isLoading]);
 
   return (
-    
     <LinearGradient
       colors={[COLORS.primary, COLORS.transluscent, COLORS.transparent]}
       style={styles.gradientContainer}>
@@ -153,20 +104,12 @@ const HomeScreen: React.FC = () => {
             removeClippedSubviews
             drawDistance={5}
             ListFooterComponent={renderFooter}
-
           />
-      
         </View>
+        <Footer />
       </View>
-   
-            <PokemonBottomSheet
-              ref={bottomSheetRef}
-              
-             
-            />
- 
+      <PokemonBottomSheet ref={bottomSheetRef} />
     </LinearGradient>
-
   );
 };
 
@@ -180,7 +123,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: SPACING[1],
+    paddingHorizontal: SPACING[1.5],
+    paddingTop: SPACING[1.5],
     backgroundColor: COLORS.white,
     borderTopEndRadius: BORDER_RADIUS.base,
     borderTopStartRadius: BORDER_RADIUS.base,

@@ -1,6 +1,22 @@
 import { MMKV } from 'react-native-mmkv';
 
-const storage = new MMKV({ id: 'pokemon-storage' });
+export const storage = new MMKV();
+
+export const StorageKeys = {
+  AUTH_TOKEN: 'auth_token',
+  USER_DATA: 'user_data',
+  FOOTER_STATE: 'footer_state',
+} as const;
+
+export const getFooterState = () => {
+  return storage.getString(StorageKeys.FOOTER_STATE) || 'catch';
+};
+
+
+export const setFooterState = (selectedTab: string) => {
+  storage.set(StorageKeys.FOOTER_STATE, selectedTab);
+};
+
 
 export const PokemonStorage = {
   // Save color for a Pokemon
