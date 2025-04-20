@@ -1,5 +1,5 @@
-import React from 'react';
-import {  StatusBar, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {  Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
@@ -8,11 +8,13 @@ import { COLORS } from 'theme/theme';
 import { AuthProvider } from 'contexts/AuthContext';
 import { MMKV } from 'react-native-mmkv';
 import { SafeAreaProvider,SafeAreaView } from 'react-native-safe-area-context';
+import { useNotification } from 'hooks/useNotifications';
+import { navigationRef } from 'services/navigationService';
 
 // Create MMKV instance for React Query persistence
 const mmkv = new MMKV({
   id: 'react-query-storage',
-  encryptionKey: 'react-query-encryption-key'
+  encryptionKey: 'react-query-encryption-key',
 });
 
 // Create query client
@@ -50,34 +52,24 @@ persistQueryClient({
 });
 
 const App = () => {
+ useNotification();
+
   return (
     <QueryClientProvider client={queryClient}>
-      {/* <View style={{ flex: 1, backgroundColor: COLORS.primary }}>
-        <SafeAreaView style={{ flex: 1 }}> */}
         <SafeAreaProvider>
-          {/* <SafeAreaView style={{flex:1,backgroundColor:'red'}}> */}
           <StatusBar
             barStyle="light-content"
-            backgroundColor={COLORS.primary} // Only affects Android
+            backgroundColor={COLORS.primary}
           />
           <AuthProvider>
-            <NavigationContainer>
+            <NavigationContainer ref={navigationRef}>
               <AppNavigator />
             </NavigationContainer>
           </AuthProvider>
-          {/* </SafeAreaView> */}
           </SafeAreaProvider>
-        {/* </SafeAreaView>
-      </View> */}
     </QueryClientProvider>
   );
 };
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.background.light,
-  },
-});
 
 export default App;

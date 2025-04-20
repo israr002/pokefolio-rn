@@ -20,6 +20,7 @@ import { PokemonStorage } from 'utils/storage';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import PokemonBottomSheet from 'components/PokemonBottomSheet';
 import { NativeViewGestureHandler } from 'react-native-gesture-handler';
+import { showLocalNotification } from 'services/notificationService';
 
 const { ImageColors } = NativeModules;
 
@@ -43,7 +44,15 @@ const HomeScreen: React.FC = () => {
   const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
 
 
-  console.log("hello")
+  useEffect(() => {
+    const run = async () => {
+      console.log("====>in local notification")
+      await showLocalNotification('🚀 Demo', 'Notification fired automatically!');
+    };
+    setTimeout(() => {
+      run();
+    }, 1000);
+  }, []);
 
   const rawList = useMemo(() => {
     return data?.pages?.flatMap((page: PokemonListResponse) => page.results) ?? [];
@@ -137,13 +146,14 @@ const HomeScreen: React.FC = () => {
             data={pokemonList}
             renderItem={renderItem}
             keyExtractor={(item) => item.name}
-            estimatedItemSize={200}
+            estimatedItemSize={100}
             onEndReached={fetchNextPage}
             onEndReachedThreshold={0.5}
             numColumns={2}
             removeClippedSubviews
             drawDistance={5}
             ListFooterComponent={renderFooter}
+
           />
       
         </View>

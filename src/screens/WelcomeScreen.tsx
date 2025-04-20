@@ -5,6 +5,7 @@ import { COLORS, TYPOGRAPHY, SPACING } from '../theme/theme';
 import { APP_CONSTANTS } from '../constants/appConstants';
 import CustomButton from 'components/CustomButton';
 import { useAuth } from 'contexts/AuthContext';
+import messaging from '@react-native-firebase/messaging';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'navigation/AppNavigator';
 
@@ -16,8 +17,24 @@ const WelcomeScreen = () => {
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
-    
-    if (!loading) {
+  
+    const checkInitialNotification = async () => {
+      // its advised to use this method in the first screen of the app so moved from useNotification hook
+      const initialNotification = await messaging().getInitialNotification();
+  
+      if (initialNotification?.data) {
+        console.log("====>in initialNotification",initialNotification?.data)
+        const { screen, pokemonId } = initialNotification.data;
+
+  
+       
+        if (screen === 'PokemonDetail' && pokemonId && user && user.emailVerified) {
+          navigation.replace('PokemonDetail', { pokemonId: Number(pokemonId) });
+          return;
+        }
+      }
+  
+      // 🔄 Fallback to auth flow
       timeout = setTimeout(() => {
         if (!user) {
           navigation.replace('Login');
@@ -27,10 +44,15 @@ const WelcomeScreen = () => {
           navigation.replace('Home');
         }
       }, 500);
+    };
+  
+    if (!loading) {
+      checkInitialNotification();
     }
   
     return () => clearTimeout(timeout);
   }, [user, loading, navigation]);
+  
 
 
 

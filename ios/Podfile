@@ -39,18 +39,13 @@ target 'pokefolio' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  # # Explicitly specify Firebase versions
-  # pod 'Firebase', '~> 11.10.0'
-  # pod 'FirebaseCore', '~> 11.10.0'
-  # pod 'FirebaseAuth', '~> 11.10.0'
-  # pod 'FirebaseStorage', '~> 11.10.0'
-  # pod 'FirebaseCoreExtension', '~> 11.10.0'
 
   # Permissions
   setup_permissions([
     'Camera',
     'PhotoLibrary',
-    'Photos'
+    'Photos',
+    'Notifications',
   ])
 
   # ImageColors module
