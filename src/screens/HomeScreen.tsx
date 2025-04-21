@@ -60,7 +60,11 @@ const HomeScreen: React.FC = () => {
     try {
       const { success } = await handleSignOut();
       if (success) {
-        navigation.navigate('Login');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        });
+
       }
     } catch (error) {
       console.error('Logout error:', error);

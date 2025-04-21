@@ -6,8 +6,11 @@ export const APP_CONSTANTS = {
   SIGNUP_SUBTITLE: 'Join the Pokémon community',
 
   // Welcome Screen
-  WELCOME_TITLE: 'Welcome to Pokefolio',
-  WELCOME_SUBTITLE: 'Your personal Pokemon collection',
+  GREETING_MORNING: 'Good Morning, NYC!',
+  GREETING_LATE_MORNING: 'Late Morning Vibes!',
+  GREETING_AFTERNOON: 'Good Afternoon, NYC!',
+  GREETING_EVENING: 'Good Evening, NYC!',
+  GREETING_NIGHT: 'Night Owl in NYC!',
 
   // Home Screen
   HOME_TITLE: 'Your Pokémon Collection',
