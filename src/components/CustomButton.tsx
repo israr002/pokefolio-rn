@@ -10,6 +10,7 @@ interface CustomButtonProps {
   isLoading?: boolean;
   disabled?: boolean;
   icon?: React.ReactNode;
+  testID?: string;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -20,6 +21,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   isLoading = false,
   disabled = false,
   icon,
+  testID,
 }) => {
 
   const getVariantStyles = () => {
@@ -93,10 +95,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   });
   return (
     <TouchableOpacity
-      style={styles.button}
+      testID={testID}
+      style={[styles.button, getVariantStyles(), getSizeStyles()]}
       onPress={onPress}
       disabled={disabled || isLoading}
-    >
+      activeOpacity={0.7}>
       {isLoading && (
         <ActivityIndicator
           style={styles.loading}

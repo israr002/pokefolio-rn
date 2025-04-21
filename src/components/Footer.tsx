@@ -53,13 +53,14 @@ const Footer: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    height: 80,
+    // height: 80,
+    paddingVertical: SPACING[3],
     backgroundColor: COLORS.white,
-    borderTopWidth: 0.5,  // Thinner border
-    borderTopColor: COLORS.gray,  // Slightly lighter gray for a soft look // Rounded top corners
+    borderTopWidth: 0.5,  
+    borderTopColor: COLORS.gray,  
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,  // Light shadow for a subtle lift effect
+    shadowOpacity: 0.1,
     shadowRadius: 5,
     paddingBottom: SPACING[2],
   },

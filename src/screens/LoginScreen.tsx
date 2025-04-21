@@ -16,7 +16,6 @@ import Animated, {
   FadeInUp,
 } from 'react-native-reanimated';
 import pokeball from 'assets/images/pokeball.png';
-import { EmailVerificationModal } from 'components/EmailVerificationModal';
 import Toast from 'components/Toast';
 
 type LoginFormData = z.infer<typeof authSchema>;
@@ -107,8 +106,9 @@ const LoginScreen = ({ navigation }: any) => {
           </Text>
         </View>
 
-        
+        <View style={styles.form}>
           <FormInput
+            testID="email-input"
             control={control}
             name="email"
             label={APP_CONSTANTS.EMAIL_LABEL}
@@ -118,6 +118,7 @@ const LoginScreen = ({ navigation }: any) => {
             error={errors.email?.message}
           />
           <FormInput
+            testID="password-input"
             control={control}
             name="password"
             label={APP_CONSTANTS.PASSWORD_LABEL}
@@ -126,13 +127,15 @@ const LoginScreen = ({ navigation }: any) => {
             error={errors.password?.message}
           />
           <CustomButton
+            testID="sign-in-button"
             title={APP_CONSTANTS.SIGN_IN_BUTTON}
             onPress={handleSubmit(onSubmit)}
             variant="primary"
             isLoading={isEmailLoading}
             disabled={isEmailLoading}
           />
-    
+        </View>
+
         <View style={styles.dividerContainer}>
           <View style={styles.divider} />
           <Text style={styles.dividerText}>{APP_CONSTANTS.DIVIDER_TEXT}</Text>
@@ -140,6 +143,7 @@ const LoginScreen = ({ navigation }: any) => {
         </View>
 
         <CustomButton
+          testID="google-sign-in-button"
           title={APP_CONSTANTS.GOOGLE_SIGN_IN}
           onPress={handleGoogleSignIn}
           variant="secondary"
@@ -155,7 +159,7 @@ const LoginScreen = ({ navigation }: any) => {
         />
         <View style={styles.footer}>
           <Text style={styles.footerText}>{APP_CONSTANTS.NO_ACCOUNT_TEXT}</Text>
-          <TouchableOpacity onPress={goToSignup}>
+          <TouchableOpacity testID="signup-link" onPress={goToSignup}>
             <Text style={styles.footerLink}>{APP_CONSTANTS.SIGN_UP_LINK}</Text>
           </TouchableOpacity>
         </View>
@@ -163,6 +167,7 @@ const LoginScreen = ({ navigation }: any) => {
 
       {toast && (
         <Toast
+          testID="toast-message"
           message={toast.message}
           type={toast.type}
           onHide={() => setToast(null)}

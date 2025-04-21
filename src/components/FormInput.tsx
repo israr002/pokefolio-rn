@@ -12,6 +12,7 @@ interface FormInputProps<T extends FieldValues> {
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   error?: string;
+  testID?: string;
 }
 
 const FormInput = <T extends FieldValues>({
@@ -23,6 +24,7 @@ const FormInput = <T extends FieldValues>({
   keyboardType = 'default',
   autoCapitalize = 'none',
   error,
+  testID,
 }: FormInputProps<T>) => {
 
   const styles = StyleSheet.create({
@@ -59,6 +61,7 @@ const FormInput = <T extends FieldValues>({
         name={name}
         render={({ field: { onChange, value } }) => (
           <TextInput
+            testID={testID}
             style={styles.input}
             onChangeText={onChange}
             value={value}

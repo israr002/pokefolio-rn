@@ -7,6 +7,7 @@ interface ToastProps {
   type?: 'success' | 'error' | 'info';
   duration?: number;
   onHide?: () => void;
+  testID?: string;
 }
 
 const Toast: React.FC<ToastProps> = ({
@@ -14,6 +15,7 @@ const Toast: React.FC<ToastProps> = ({
   type = 'info',
   duration = 3000,
   onHide,
+  testID,
 }) => {
   const opacity = new Animated.Value(0);
 
@@ -59,6 +61,7 @@ const Toast: React.FC<ToastProps> = ({
 
   return (
     <Animated.View
+      testID={testID}
       style={[
         styles.container,
         {
