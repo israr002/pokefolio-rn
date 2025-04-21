@@ -3,7 +3,6 @@ import storage from '@react-native-firebase/storage';
 import { GoogleSignin, statusCodes as googleStatusCodes } from '@react-native-google-signin/google-signin';
 import { Platform, Alert } from 'react-native';
 import Config from 'react-native-config';
-import messaging from '@react-native-firebase/messaging';
 import { getAuthErrorMessage } from 'utils/authErrors';
 import { SignupFormData } from 'schemas/authSchema';
 import { APP_CONSTANTS } from 'constants/appConstants';
@@ -132,6 +131,9 @@ export const signUp = async (
         ...(uploadedPhotoURL && { photoURL: uploadedPhotoURL }),
       });
 
+      // Reload the user to ensure profile changes are applied
+      await user.reload();
+
       // Send email verification
       await user.sendEmailVerification();
 
@@ -180,8 +182,13 @@ export const resendVerificationEmail = async (): Promise<{ success: boolean; err
 
 export const handleSignOut = async (): Promise<{ success: boolean; error?: string }> => {
   try {
+
+    const googleUser = await GoogleSignin.getCurrentUser();
+    if (googleUser) {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+    }
     await auth.signOut();
-    await messaging().deleteToken();
     return { success: true };
   } catch (error: any) {
     console.error('Sign out error:', error);

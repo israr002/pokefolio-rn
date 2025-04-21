@@ -16,7 +16,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(async (currentUser) => {
+    const unsubscribeAuth = auth().onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
         const verified = await checkEmailVerification();
@@ -25,7 +25,14 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       setLoading(false);
     });
 
-    return unsubscribe;
+    const unsubscribeUser = auth().onUserChanged((currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => {
+      unsubscribeAuth();
+      unsubscribeUser();
+    };
   }, []);
 
   return (

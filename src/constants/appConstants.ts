@@ -81,7 +81,7 @@ export const APP_CONSTANTS = {
   VERIFICATION_EMAIL_SENT: 'Verification email has been sent',
   VERIFY_EMAIL_SUBTITLE: 'Please check your inbox and verify your email address to continue',
   RESEND_VERIFICATION_BUTTON: 'Resend Verification Email',
-  CHECK_VERIFICATION_BUTTON: 'Check Verification Status',
+  CHECK_VERIFICATION_BUTTON: 'I Have Verified',
 
   // Email Verification
   VERIFY_EMAIL_TITLE: 'Verify Your Email',

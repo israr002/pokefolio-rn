@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { COLORS, TYPOGRAPHY, SPACING } from 'theme/theme';
 import { APP_CONSTANTS } from 'constants/appConstants';
 import CustomButton from 'components/CustomButton';
 import { checkEmailVerification, resendVerificationEmail } from 'services/authService';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'navigation/AppNavigator';
+import auth from '@react-native-firebase/auth';
 
 type EmailVerificationScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EmailVerification'>;
 
@@ -21,8 +22,10 @@ const EmailVerificationScreen = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const isVerified = await checkEmailVerification();
       
+      await auth().currentUser?.reload();
+      const isVerified = await checkEmailVerification();
+
       if (isVerified) {
         navigation.replace('Home');
       } else {
@@ -40,7 +43,7 @@ const EmailVerificationScreen = () => {
       setIsResending(true);
       setError(null);
       const result = await resendVerificationEmail();
-      
+
       if (result.success) {
         setResendSuccess(true);
         setTimeout(() => setResendSuccess(false), 3000);
@@ -54,17 +57,12 @@ const EmailVerificationScreen = () => {
     }
   };
 
-  useEffect(() => {
-    const interval = setInterval(handleCheckVerification, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>{APP_CONSTANTS.VERIFY_EMAIL_TITLE}</Text>
         <Text style={styles.subtitle}>{APP_CONSTANTS.VERIFY_EMAIL_SUBTITLE}</Text>
-        
+
         {error && (
           <Text style={styles.errorText}>{error}</Text>
         )}
@@ -134,4 +132,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EmailVerificationScreen; 
+export default EmailVerificationScreen;
