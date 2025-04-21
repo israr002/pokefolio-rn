@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } fr
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import FormInput from 'components/FormInput';
-import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from '../theme/theme';
+import { COLORS, TYPOGRAPHY, SPACING } from 'theme/theme';
 import LinearGradient from 'react-native-linear-gradient';
 import { ImageSelector } from 'components/ImageSelector';
 import CustomButton from 'components/CustomButton';

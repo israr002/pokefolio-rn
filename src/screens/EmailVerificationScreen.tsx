@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { COLORS, TYPOGRAPHY, SPACING } from '../theme/theme';
-import { APP_CONSTANTS } from '../constants/appConstants';
+import { COLORS, TYPOGRAPHY, SPACING } from 'theme/theme';
+import { APP_CONSTANTS } from 'constants/appConstants';
 import CustomButton from 'components/CustomButton';
 import { checkEmailVerification, resendVerificationEmail } from 'services/authService';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';

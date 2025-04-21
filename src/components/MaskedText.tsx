@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, StyleSheet, TextStyle} from 'react-native';
 import {LinearGradient} from 'react-native-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
-import {TYPOGRAPHY} from '../theme/theme';
+import {TYPOGRAPHY} from 'theme/theme';
 
 type MaskedTextProps = {
   text: string;

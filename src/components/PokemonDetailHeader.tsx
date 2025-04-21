@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, TouchableOpacity, StyleSheet, Text} from 'react-native';
-import {COLORS, SPACING, TYPE_COLORS, TYPOGRAPHY} from '../theme/theme';
+import {COLORS, SPACING, TYPE_COLORS, TYPOGRAPHY} from 'theme/theme';
 import MaskedText from './MaskedText';
 import {Icon} from './Icon';
 import LinearGradient from 'react-native-linear-gradient';

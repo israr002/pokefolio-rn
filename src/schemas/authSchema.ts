@@ -1,14 +1,16 @@
 import {z} from 'zod';
-import { APP_CONSTANTS } from '../constants/appConstants';
+import { APP_CONSTANTS } from 'constants/appConstants';
 
 export const authSchema = z.object({
   email: z
-    .string()
-    .min(1, APP_CONSTANTS.EMAIL_REQUIRED)
+    .string({
+      required_error: APP_CONSTANTS.EMAIL_REQUIRED,
+    })
     .email(APP_CONSTANTS.EMAIL_INVALID),
   password: z
-    .string()
-    .min(1, APP_CONSTANTS.PASSWORD_REQUIRED)
+    .string({
+      required_error: APP_CONSTANTS.PASSWORD_REQUIRED,
+    })
     .min(6, APP_CONSTANTS.PASSWORD_TOO_SHORT),
 });
 

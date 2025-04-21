@@ -13,7 +13,7 @@ import {
 import * as ImagePicker from 'react-native-image-picker';
 import {Icon} from './Icon';
 import {requestPermission} from 'utils/permissions';
-import {COLORS} from '../theme/theme';
+import {COLORS} from 'theme/theme';
 import {PERMISSIONS} from 'react-native-permissions';
 
 interface ImageSelectorProps {

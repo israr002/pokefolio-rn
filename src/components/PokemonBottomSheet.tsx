@@ -10,16 +10,16 @@ import {
 import { BottomSheetModal, BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { RootStackParamList } from 'navigation/AppNavigator';
 import {
   COLORS,
   TYPOGRAPHY,
   SPACING,
   BORDER_RADIUS,
   TYPE_COLORS,
-} from '../theme/theme';
+} from 'theme/theme';
 import CustomButton from './CustomButton';
-import { usePokemonDetails } from '../hooks/usePokemon';
+import { usePokemonDetails } from 'hooks/usePokemon';
 import { getPokemonIdFromUrl, getPokemonImageUrl } from 'utils/pokemon';
 import LinearGradient from 'react-native-linear-gradient';
 import FastImage from '@d11/react-native-fast-image';

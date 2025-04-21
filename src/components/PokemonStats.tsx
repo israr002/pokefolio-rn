@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {COLORS, SPACING, TYPE_COLORS, TYPOGRAPHY, BORDER_RADIUS} from '../theme/theme';
+import {COLORS, SPACING, TYPE_COLORS, TYPOGRAPHY, BORDER_RADIUS} from 'theme/theme';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,

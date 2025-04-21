@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS, TYPOGRAPHY, SPACING } from '../theme/theme';
+import { COLORS, TYPOGRAPHY, SPACING } from 'theme/theme';
 import messaging from '@react-native-firebase/messaging';
 import { useAuth } from 'contexts/AuthContext';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';

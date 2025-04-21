@@ -25,10 +25,8 @@ const LoginScreen = ({ navigation }: any) => {
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const [showVerificationModal, setShowVerificationModal] = React.useState(false);
   const [currentEmail, setCurrentEmail] = React.useState<string>('');
-  const [isResending, setIsResending] = React.useState(false);
-  const [isEmailSent, setIsEmailSent] = React.useState(false);
+
 
   React.useEffect(() => {
     if (toast && toast.message) {
@@ -56,7 +54,6 @@ const LoginScreen = ({ navigation }: any) => {
         setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
       } else if (!result.emailVerified) {
         setCurrentEmail(data.email);
-        setShowVerificationModal(true);
       }else{
         navigation.navigate('Home');
       }
@@ -83,26 +80,6 @@ const LoginScreen = ({ navigation }: any) => {
       setIsGoogleLoading(false);
     }
   };
-
-  const handleResendVerification = async () => {
-    try {
-      setIsResending(true);
-      const result = await resendVerificationEmail();
-      if (result.success) {
-        setIsEmailSent(true);
-      } 
-    } catch (error: any) {
-      console.error(APP_CONSTANTS.AUTH_ERROR_LOG, error);
-    } finally {
-      setIsResending(false);
-    }
-  };
-
-  React.useEffect(() => {
-    if (!showVerificationModal) {
-      setIsEmailSent(false);
-    }
-  }, [showVerificationModal]);
 
   const goToSignup = React.useCallback(() => {
     navigation.navigate('Signup');
@@ -184,14 +161,6 @@ const LoginScreen = ({ navigation }: any) => {
         </View>
       </View>
 
-      <EmailVerificationModal
-        isVisible={showVerificationModal}
-        onClose={() => setShowVerificationModal(false)}
-        onResendEmail={handleResendVerification}
-        email={currentEmail}
-        isResending={isResending}
-        isEmailSent={isEmailSent}
-      />
       {toast && (
         <Toast
           message={toast.message}

@@ -7,7 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS } from '../theme/theme';
+import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS } from 'theme/theme';
 import { useAuth } from 'contexts/AuthContext';
 import { getInitials } from 'utils/getInitials';
 import Icon from './Icons';

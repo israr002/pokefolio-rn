@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
-import { COLORS, SPACING } from '../theme/theme';
-import { getFooterState, setFooterState } from '../utils/storage';
+import { COLORS, SPACING } from 'theme/theme';
+import { getFooterState, setFooterState } from 'utils/storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Footer: React.FC = () => {
