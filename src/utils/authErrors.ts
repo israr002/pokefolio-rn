@@ -1,13 +1,6 @@
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 
 export const getAuthErrorMessage = (error: FirebaseAuthTypes.NativeFirebaseAuthError): string => {
-  // Log the full error for debugging
-  console.log('Firebase Auth Error:', {
-    code: error.code,
-    message: error.message,
-    nativeErrorCode: error.nativeErrorCode,
-    nativeErrorMessage: error.nativeErrorMessage,
-  });
 
   switch (error.code) {
     case 'auth/user-not-found':

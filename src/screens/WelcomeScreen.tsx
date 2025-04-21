@@ -9,7 +9,7 @@ import { RootStackParamList } from 'navigation/AppNavigator';
 import LinearGradient from 'react-native-linear-gradient';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import pokeball from 'assets/images/pokeball.png';
-import { APP_CONSTANTS } from '../constants/AppConstants';
+import { APP_CONSTANTS } from 'constants/appConstants';
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -29,10 +29,10 @@ const WelcomeScreen = () => {
     const [hours, minutes] = nycTime.split(':').map(Number);
     const time = hours * 100 + minutes;
 
-    if (time >= 500 && time < 1000) return APP_CONSTANTS.GREETING_MORNING;
-    if (time >= 1000 && time < 1200) return APP_CONSTANTS.GREETING_LATE_MORNING;
-    if (time >= 1200 && time < 1700) return APP_CONSTANTS.GREETING_AFTERNOON;
-    if (time >= 1700 && time < 2100) return APP_CONSTANTS.GREETING_EVENING;
+    if (time >= 500 && time < 1000) {return APP_CONSTANTS.GREETING_MORNING;}
+    if (time >= 1000 && time < 1200) {return APP_CONSTANTS.GREETING_LATE_MORNING;}
+    if (time >= 1200 && time < 1700) {return APP_CONSTANTS.GREETING_AFTERNOON;}
+    if (time >= 1700 && time < 2100) {return APP_CONSTANTS.GREETING_EVENING;}
     return APP_CONSTANTS.GREETING_NIGHT;
   }, []);
 

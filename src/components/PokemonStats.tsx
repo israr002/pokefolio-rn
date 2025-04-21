@@ -6,31 +6,12 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { PokemonDetails } from 'types/pokemon';
 
 type PokemonType = keyof typeof TYPE_COLORS;
 
-interface Pokemon {
-  name: string;
-  id: string;
-  types: Array<{
-    type: {
-      name: string;
-    };
-  }>;
-  height: number;
-  weight: number;
-  abilities: string[];
-  stats: Array<{
-    base_stat: number;
-    stat: { name: string };
-  }>;
-  species: {
-    flavor_text: string;
-  };
-}
-
 interface PokemonStatsProps {
-  pokemon: Pokemon;
+  pokemon: PokemonDetails;
 }
 
 const PokemonStats: React.FC<PokemonStatsProps> = ({pokemon}) => {

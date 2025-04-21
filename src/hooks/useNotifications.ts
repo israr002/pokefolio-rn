@@ -36,7 +36,7 @@ export function useNotification() {
       }
     };
 
-   
+
 
     const unsubscribeOnMessage = messaging().onMessage(async message => {
       console.log('Foreground FCM:', message);
@@ -51,8 +51,8 @@ export function useNotification() {
       switch (type) {
         case EventType.PRESS:
           if (detail.notification?.data?.screen === 'PokemonDetail' && detail.notification?.data?.pokemonId) {
-            navigate('PokemonDetail', { 
-              pokemonId: Number(detail.notification.data.pokemonId) 
+            navigate('PokemonDetail', {
+              pokemonId: Number(detail.notification.data.pokemonId),
             });
           }
           break;
@@ -63,35 +63,12 @@ export function useNotification() {
     });
 
     const unsubscribeNotificationOpenedApp = messaging().onNotificationOpenedApp(remoteMessage => {
-      if (remoteMessage?.data?.screen === "PokemonDetail" && remoteMessage?.data?.pokemonId) {
-        navigate('PokemonDetail', { 
-          pokemonId: Number(remoteMessage.data.pokemonId) 
+      if (remoteMessage?.data?.screen === 'PokemonDetail' && remoteMessage?.data?.pokemonId) {
+        navigate('PokemonDetail', {
+          pokemonId: Number(remoteMessage.data.pokemonId),
         });
       }
     });
-
-    // const checkInitialNotification = async () => {
-    //   const initialNotification = await messaging().getInitialNotification();
-    //   if (initialNotification) {
-    //     console.log('Notification caused app to open from quit state:', initialNotification);
-    //     if (initialNotification?.data) {
-    //       console.log("====>in",initialNotification?.data)
-    //       const { screen, pokemonId} = initialNotification?.data;
-    //       console.log("====>in",screen,pokemonId)
-    //       switch (screen) {
-    //         case "PokemonDetail":
-    //           console.log("====>in switch",screen,pokemonId)
-    //           navigate('PokemonDetail', { 
-    //             pokemonId: Number(pokemonId) 
-    //           });
-    //           break;
-    //         default:
-    //           break;
-    //       }
-    //     }
-    //     // You can navigate to a specific screen or perform actions here based on the notification data
-    //   }
-    // };
 
     requestPermission();
     createChannel();
@@ -103,5 +80,5 @@ export function useNotification() {
     };
   }, []);
 
-  
+
 }

@@ -1,19 +1,18 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   View,
-  Text,
   ScrollView,
   StyleSheet,
   Dimensions,
   ActivityIndicator,
   BackHandler,
+  StatusBar,
 } from 'react-native';
 import {
   BORDER_RADIUS,
   COLORS,
   SPACING,
   TYPE_COLORS,
-  TYPOGRAPHY,
 } from 'theme/theme';
 import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -30,26 +29,18 @@ import PokemonStats from 'components/PokemonStats';
 import TypeBadge from 'components/TypeBadge';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePokemonDetails } from 'hooks/usePokemon';
+import { PokemonType } from 'types/pokemon';
+import PokemonAbout from 'components/PokemonAbout';
+import PokemonMoves from 'components/PokemonMoves';
 
-type PokemonType = keyof typeof TYPE_COLORS;
-
-interface Move {
-  move: {
-    name: string;
-  };
-  version_group_details: Array<{
-    level_learned_at: number;
-  }>;
-}
+const screenWidth = Dimensions.get('window').width;
 
 const PokemonDetailScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, 'PokemonDetail'>>();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
 
-
-  const onBackPress = () => {
-
+  const onBackPress = useCallback(() => {
     const stackLength = navigation.getState().routes.length;
 
     if (stackLength <= 1) {
@@ -59,8 +50,7 @@ const PokemonDetailScreen: React.FC = () => {
 
     navigation.goBack();
     return true;
-  };
-
+  }, [navigation]);
 
   useFocusEffect(
     useCallback(() => {
@@ -69,18 +59,21 @@ const PokemonDetailScreen: React.FC = () => {
       // there will be no screen left and the app would otherwise quit. By intercepting the back
       // press, we can ensure the user is always navigated to the Home screen instead.
       const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-
       return () => backHandler.remove();
-    }, [])
+    }, [onBackPress])
   );
-  const { pokemon, pokemonId } = route.params;
 
-  const { data: pokemonDetails, isLoading } = usePokemonDetails(pokemonId);
+  const { pokemon, pokemonId } = route.params;
+  const shouldFetch = !pokemon && !!pokemonId;
+  const { data: pokemonDetails, isLoading, error } = usePokemonDetails(
+    shouldFetch ? String(pokemonId) : ''
+  );
   const activePokemon = pokemonDetails || pokemon;
 
-  const screenWidth = Dimensions.get('window').width;
-  const primaryType = activePokemon?.types[0]?.type?.name as PokemonType || 'normal';
+  const primaryType = useMemo(
+    () => (activePokemon?.types?.[0]?.type?.name as PokemonType) || 'normal',
+    [activePokemon]
+  );
 
   const cardTranslateY = useSharedValue(500);
   const imageTranslateX = useSharedValue(screenWidth);
@@ -88,7 +81,7 @@ const PokemonDetailScreen: React.FC = () => {
   useEffect(() => {
     cardTranslateY.value = withTiming(0, { duration: 500 });
     imageTranslateX.value = withTiming(0, { duration: 700 });
-  }, []);
+  }, [cardTranslateY, imageTranslateX]);
 
   const cardStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: cardTranslateY.value }],
@@ -98,7 +91,7 @@ const PokemonDetailScreen: React.FC = () => {
     transform: [{ translateX: imageTranslateX.value }],
   }));
 
-  if (!activePokemon) {
+  if (isLoading || !activePokemon) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLORS.primary} />
@@ -108,6 +101,7 @@ const PokemonDetailScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
       <PokemonDetailHeader
         pokemon={activePokemon}
         onBackPress={() => navigation.goBack()}
@@ -130,67 +124,14 @@ const PokemonDetailScreen: React.FC = () => {
             <TypeBadge key={index} type={type.type.name} />
           ))}
         </View>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.aboutSection}>
-            <Text style={[styles.dataTitle, { color: TYPE_COLORS[primaryType] }]}>
-              About
-            </Text>
 
-            <View style={styles.aboutRow}>
-              <View style={styles.aboutColoum}>
-                <Text style={styles.dataValue}>
-                  {(activePokemon.weight / 10).toFixed(1)}kg
-                </Text>
-                <Text style={styles.dataLabel}>Weight</Text>
-              </View>
-              <View style={styles.verticalLine} />
-              <View style={styles.aboutColoum}>
-                <Text style={styles.dataValue}>
-                  {(activePokemon.height / 10).toFixed(1)}m
-                </Text>
-                <Text style={styles.dataLabel}>Height</Text>
-              </View>
-              <View style={styles.verticalLine} />
-              <View style={styles.aboutColoum}>
-                <Text style={styles.dataValue} numberOfLines={2}>
-                  {activePokemon.abilities.map(i => i.ability.name).join(', ')}
-                </Text>
-                <Text style={styles.dataLabel}>Abilities</Text>
-              </View>
-            </View>
-
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <PokemonAbout pokemon={activePokemon} typeColor={TYPE_COLORS[primaryType]} />
             <PokemonStats pokemon={activePokemon} />
-
-            <Text style={[styles.dataTitle, { color: TYPE_COLORS[primaryType], marginTop: SPACING[4] }]}>
-              Top 10 Moves
-            </Text>
-            <View style={styles.movesContainer}>
-              {activePokemon.moves
-                .filter((move: Move) =>
-                  move.version_group_details.some(
-                    (detail) => detail.level_learned_at === 0,
-                  ),
-                )
-                .slice(0, 10)
-                .map((move: Move, index: number) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.moveBadge,
-                      {
-                        backgroundColor: TYPE_COLORS[primaryType],
-                        borderColor: TYPE_COLORS[primaryType]
-                      }
-                    ]}
-                  >
-                    <Text style={[styles.moveBadgeText, { color: COLORS.white }]}>
-                      {move.move.name.replace(/-/g, ' ')}
-                    </Text>
-                  </View>
-                ))}
-            </View>
-          </View>
-        </ScrollView>
+            {activePokemon.moves && (
+              <PokemonMoves pokemon={activePokemon} typeColor={TYPE_COLORS[primaryType]} />
+            )}
+          </ScrollView>
       </Animated.View>
     </View>
   );
@@ -226,69 +167,10 @@ const styles = StyleSheet.create({
     marginVertical: SPACING[3],
     marginHorizontal: SPACING[2],
   },
-  aboutSection: {
-    paddingHorizontal: SPACING[4],
-  },
-  dataTitle: {
-    fontSize: TYPOGRAPHY.fontSize.xl,
-    fontWeight: TYPOGRAPHY.fontWeight.bold,
-    marginVertical: SPACING[6],
-    textAlign: 'center',
-  },
-  aboutRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  aboutColoum: {
-    alignItems: 'center',
+  errorContainer: {
     flex: 1,
     justifyContent: 'center',
-    minHeight: 60,
-  },
-  dataLabel: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    color: COLORS.black,
-    textAlign: 'center',
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-  },
-  dataValue: {
-    fontSize: TYPOGRAPHY.fontSize.base,
-    color: COLORS.black,
-    fontWeight: TYPOGRAPHY.fontWeight.semibold,
-    marginBottom: SPACING[4],
-    textAlign: 'center',
-  },
-  verticalLine: {
-    width: 1,
-    backgroundColor: COLORS.gray,
-  },
-  movesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: SPACING[2],
-    marginTop: SPACING[2],
-    paddingHorizontal: SPACING[2],
-  },
-  moveBadge: {
-    paddingHorizontal: SPACING[3],
-    paddingVertical: SPACING[1],
-    borderRadius: BORDER_RADIUS.full,
-    borderWidth: 1,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  moveBadgeText: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    fontWeight: TYPOGRAPHY.fontWeight.medium,
-    textTransform: 'capitalize',
-    textAlign: 'center',
+    alignItems: 'center',
   },
 });
 

@@ -8,41 +8,22 @@ import EmailVerificationScreen from 'screens/EmailVerificationScreen';
 import HomeScreen from 'screens/HomeScreen';
 import WelcomeScreen from 'screens/WelcomeScreen';
 import PokemonDetailScreen from 'screens/PokemonDetailScreen';
+import { PokemonDetails } from 'types/pokemon';
 
 export type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
   Signup: undefined;
-  EmailVerification: { email: string};
+  EmailVerification: { email: string };
   Home: undefined;
-  PokemonDetail: {
-    pokemon: {
-      name: string;
-      id: string;
-      types: Array<{
-        type: {
-          name: string;
-        };
-      }>;
-      height: number;
-      weight: number;
-      abilities: string[];
-      stats: Array<{
-        base_stat: number;
-        stat: { name: string };
-      }>;
-      species: {
-        flavor_text: string;
-      };
-    };
-  };
+  PokemonDetail: { pokemon: PokemonDetails,pokemonId? : string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <BottomSheetModalProvider>
         <Stack.Navigator
           screenOptions={{
@@ -54,7 +35,7 @@ const AppNavigator = () => {
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="EmailVerification" component={EmailVerificationScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="PokemonDetail"  component={PokemonDetailScreen} />
+          <Stack.Screen name="PokemonDetail" component={PokemonDetailScreen} />
         </Stack.Navigator>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>

@@ -39,14 +39,13 @@ const HomeScreen: React.FC = () => {
 
   useEffect(() => {
     const run = async () => {
-      console.log("====>in local notification");
       await showLocalNotification('🚀 Demo', 'Notification fired automatically!');
     };
-    setTimeout(() => {
-      run();
-    }, 1000);
+    // setTimeout(() => {
+    //   run();
+    // }, 1000);
   }, []);
-  console.log("====>data", data);
+
 
   const pokemonList = useMemo(() => {
     return data?.pages?.flatMap((page: PokemonListResponse) => page.results) ?? [];
@@ -81,7 +80,7 @@ const HomeScreen: React.FC = () => {
   }, [handlePokemonPress]);
 
   const renderFooter = useCallback(() => {
-    if (!isFetchingNextPage && !isLoading) return null;
+    if (!isFetchingNextPage && !isLoading) {return null;}
     return (
       <ActivityIndicator
         style={styles.loadingIndicator}

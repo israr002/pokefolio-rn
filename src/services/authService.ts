@@ -3,6 +3,7 @@ import storage from '@react-native-firebase/storage';
 import { GoogleSignin, statusCodes as googleStatusCodes } from '@react-native-google-signin/google-signin';
 import { Platform, Alert } from 'react-native';
 import Config from 'react-native-config';
+import messaging from '@react-native-firebase/messaging';
 import { getAuthErrorMessage } from 'utils/authErrors';
 import { SignupFormData } from 'schemas/authSchema';
 import { APP_CONSTANTS } from 'constants/appConstants';
@@ -21,7 +22,7 @@ GoogleSignin.configure({
 
 // Check Google Play Services (Android only)
  const confirmGooglePlayServices = async () => {
-  if (Platform.OS == 'ios') return true;  // Skip for iOS since it's not needed
+  if (Platform.OS == 'ios') {return true;}  // Skip for iOS since it's not needed
 
   try {
     await GoogleSignin.hasPlayServices();
@@ -36,17 +37,17 @@ GoogleSignin.configure({
     }
     throw hasPlayServicesError;
   }
-}
+};
 
 export const showSignInWithGoogleFailed = (): void => {
   Alert.alert(
     'Google Sign-In Failed',
     'If you have an existing account, try signing in again or resetting your password.'
   );
-}
+};
 
 export const signInWithEmail = async (
-  email: string, 
+  email: string,
   password: string
 ): Promise<{ success: boolean; error?: string; emailVerified?: boolean; user?: any }> => {
   try {
@@ -55,7 +56,7 @@ export const signInWithEmail = async (
     return {
       success: true,
       emailVerified: isEmailVerified,
-      user: userCredential.user
+      user: userCredential.user,
     };
   } catch (error: any) {
     console.error('Login error:', error);
@@ -63,39 +64,39 @@ export const signInWithEmail = async (
   }
 };
 
-export const signInWithGoogle = async (): Promise<{ 
-  success: boolean; 
-  error?: string; 
-  user?: any 
+export const signInWithGoogle = async (): Promise<{
+  success: boolean;
+  error?: string;
+  user?: any
 }> => {
   try {
     const hasPlayServices = await confirmGooglePlayServices();
     if (!hasPlayServices) {
-      return { 
-        success: false, 
-        error: 'Google Play Services are not available' 
+      return {
+        success: false,
+        error: 'Google Play Services are not available',
       };
     }
 
     const user = await GoogleSignin.signIn();
     const { idToken } = await GoogleSignin.getTokens();
-    
+
     if (!idToken) {
-      return { 
-        success: false, 
-        error: 'No idToken received from Google' 
+      return {
+        success: false,
+        error: 'No idToken received from Google',
       };
     }
 
     const credential = GoogleAuthProvider.credential(idToken);
     await signInWithCredential(auth, credential);
-    
+
     return { success: true, user };
   } catch (error: any) {
     console.error('Google Sign-In Error:', error);
-    return { 
-      success: false, 
-      error: getAuthErrorMessage(error) 
+    return {
+      success: false,
+      error: getAuthErrorMessage(error),
     };
   }
 };
@@ -110,30 +111,30 @@ export const signUp = async (
         data.email,
         data.password
       );
-  
+
       const user = userCredential.user;
       if (!user) {
         return { success: false, error: 'User creation failed' };
       }
-  
+
       let uploadedPhotoURL = profilePhotoUri;
-  
+
       // If a profile photo is provided, upload it to Firebase Storage
       if (profilePhotoUri) {
         const reference = storage().ref(`profile_photos/${user.uid}`);
         await reference.putFile(profilePhotoUri);
         uploadedPhotoURL = await reference.getDownloadURL();
       }
-  
+
       // Update the Firebase user's profile with name and photo URL
       await user.updateProfile({
         displayName: data.displayName,
         ...(uploadedPhotoURL && { photoURL: uploadedPhotoURL }),
       });
-  
+
       // Send email verification
       await user.sendEmailVerification();
-  
+
       return { success: true };
     } catch (error: any) {
       console.error('Sign up error:', error);
@@ -158,7 +159,7 @@ export const checkEmailVerification = async (): Promise<boolean> => {
     return false;
   }
 };
-  
+
 
 export const resendVerificationEmail = async (): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -166,7 +167,7 @@ export const resendVerificationEmail = async (): Promise<{ success: boolean; err
       if (!user) {
         return { success: false, error: 'No user is currently signed in' };
       }
-  
+
       await user.sendEmailVerification();
       await signOut(auth);
       return { success: true };
@@ -180,6 +181,7 @@ export const resendVerificationEmail = async (): Promise<{ success: boolean; err
 export const handleSignOut = async (): Promise<{ success: boolean; error?: string }> => {
   try {
     await auth.signOut();
+    await messaging().deleteToken();
     return { success: true };
   } catch (error: any) {
     console.error('Sign out error:', error);

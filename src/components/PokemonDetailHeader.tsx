@@ -5,33 +5,22 @@ import MaskedText from './MaskedText';
 import {Icon} from './Icon';
 import LinearGradient from 'react-native-linear-gradient';
 import { formatPokemonId } from 'utils/pokemon';
+import { PokemonDetails } from 'types/pokemon';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getPokemonImageUrl } from 'utils/pokemon';
+import FastImage from '@d11/react-native-fast-image';
 
 type PokemonType = keyof typeof TYPE_COLORS;
 
-interface Pokemon {
-  name: string;
-  id: string;
-  types: Array<{
-    type: {
-      name: string;
-    };
-  }>;
-  height: number;
-  weight: number;
-  abilities: string[];
-  stats: Array<{
-    base_stat: number;
-    stat: { name: string };
-  }>;
-  species: {
-    flavor_text: string;
-  };
-}
-
 interface PokemonDetailHeaderProps {
-  pokemon: Pokemon;
+  pokemon: PokemonDetails;
   onBackPress: () => void;
-  insets: {top: number};
+  insets: {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+  };
 }
 
 const PokemonDetailHeader: React.FC<PokemonDetailHeaderProps> = ({
