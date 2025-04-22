@@ -13,7 +13,6 @@ export const usePokemonList = (limit: number = API.POKEMON_PER_PAGE) => {
       const nextOffset = lastPage.next?.match(/offset=(\d+)/)?.[1];
       return nextOffset ? parseInt(nextOffset, 10) : undefined;
     },
-    staleTime: API.CACHE_DURATION * 1000, // Convert seconds to milliseconds
     retry: (failureCount, error: any) => {
       if (
         error.message === 'No internet connection' ||
@@ -30,8 +29,7 @@ export const usePokemonDetails = (id: string) => {
   return useQuery<PokemonDetails, Error>({
     queryKey: ['pokemon', 'details', id],
     queryFn: () => pokemonApi.getPokemonDetails(id),
-    enabled: !!id, 
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!id,
     retry: (failureCount, error: any) => {
       if (
         error.message === 'No internet connection' ||

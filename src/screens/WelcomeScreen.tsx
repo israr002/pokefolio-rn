@@ -41,7 +41,7 @@ const WelcomeScreen = () => {
   }, [getGreeting]);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout | undefined;
+    let timeoutId: NodeJS.Timeout;
 
     const checkInitialNotification = async () => {
       const initialNotification = await messaging().getInitialNotification();
@@ -50,7 +50,7 @@ const WelcomeScreen = () => {
         const { screen, pokemonId } = initialNotification.data;
 
         if (screen === 'PokemonDetail' && pokemonId && user?.emailVerified) {
-          navigation.replace('PokemonDetail', { pokemonId: Number(pokemonId) });
+          navigation.replace('PokemonDetail', { pokemonId: String(pokemonId) });
           return;
         }
       }

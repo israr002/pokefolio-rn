@@ -16,7 +16,7 @@ export type RootStackParamList = {
   Signup: undefined;
   EmailVerification: { email: string };
   Home: undefined;
-  PokemonDetail: { pokemon: PokemonDetails,pokemonId? : string };
+  PokemonDetail: { pokemon?: PokemonDetails,pokemonId? : string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

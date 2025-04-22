@@ -1,11 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { checkEmailVerification } from 'services/authService';
 
 interface AuthContextType {
   user: FirebaseAuthTypes.User | null;
   loading: boolean;
-  isEmailVerified: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -13,15 +11,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   useEffect(() => {
     const unsubscribeAuth = auth().onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
-      if (currentUser) {
-        const verified = await checkEmailVerification();
-        setIsEmailVerified(verified);
-      }
       setLoading(false);
     });
 
@@ -39,8 +32,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     <AuthContext.Provider 
       value={{ 
         user, 
-        loading, 
-        isEmailVerified,
+        loading,
       }}
     >
       {children}
