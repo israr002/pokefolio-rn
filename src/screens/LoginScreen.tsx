@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Icon } from 'components/Icon';
 import { APP_CONSTANTS } from 'constants/appConstants';
-import { signInWithEmail, signInWithGoogle, resendVerificationEmail } from 'services/authService';
+import { signInWithEmail, signInWithGoogle } from 'services/authService';
 import { getAuthErrorMessage } from 'utils/authErrors';
 import FormInput from 'components/FormInput';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS } from 'theme/theme';
@@ -24,7 +24,6 @@ const LoginScreen = ({ navigation }: any) => {
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const [currentEmail, setCurrentEmail] = React.useState<string>('');
 
 
   React.useEffect(() => {
@@ -52,7 +51,6 @@ const LoginScreen = ({ navigation }: any) => {
       if (!result.success) {
         setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
       } else if (!result.emailVerified) {
-        setCurrentEmail(data.email);
       }else{
         navigation.navigate('Home');
       }

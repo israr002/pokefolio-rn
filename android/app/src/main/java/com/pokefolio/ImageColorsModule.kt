@@ -58,8 +58,8 @@ class ImageColorsModule(reactContext: ReactApplicationContext) : ReactContextBas
                 try {
                     val palette = Palette.from(image).generate()
                     val vibrant = getHex(palette.getVibrantColor(fallbackColorInt))
-                    val lightVibrant = getHex(palette.getLightVibrantColor(fallbackColorInt))
-                    val finalColor = if (vibrant.equals("#FFFFFF", ignoreCase = true)) lightVibrant else vibrant
+                    val dominant = getHex(palette.getDominantColor(fallbackColorInt))
+                    val finalColor = if (vibrant.equals("#FFFFFF", ignoreCase = true)) dominant else vibrant
                     promise.resolve(finalColor)
                     
                 } catch (err: Exception) {

@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -10,
     right: -5,
-    opacity: 0.07,
+    opacity: 0.09,
     zIndex: 1,
   },
   idContainer: {
@@ -144,4 +144,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default PokemonCard;
+export default React.memo(PokemonCard);

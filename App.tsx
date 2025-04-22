@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import {  Platform, StatusBar, StyleSheet, View } from 'react-native';
+import React from 'react';
+import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
@@ -7,7 +7,7 @@ import AppNavigator from './src/navigation/AppNavigator';
 import { COLORS } from 'theme/theme';
 import { AuthProvider } from 'contexts/AuthContext';
 import { MMKV } from 'react-native-mmkv';
-import { SafeAreaProvider,SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useNotification } from 'hooks/useNotifications';
 import { navigationRef } from 'services/navigationService';
 

@@ -3,8 +3,8 @@ import {
   View,
   StyleSheet,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
 import { usePokemonList } from 'hooks/usePokemon';
 import PokemonCard from 'components/PokemonCard';
 import Header from 'components/Header';
@@ -70,6 +70,12 @@ const HomeScreen: React.FC = () => {
     }
   }, [navigation]);
 
+  const handleEndReached = useCallback(() => {
+    if (!isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, isFetchingNextPage]);
+
   const renderItem = useCallback(({ item }: { item: Pokemon }) => {
     return (
       <PokemonCard
@@ -80,7 +86,7 @@ const HomeScreen: React.FC = () => {
   }, [handlePokemonPress]);
 
   const renderFooter = useCallback(() => {
-    if (!isFetchingNextPage && !isLoading) {return null;}
+    if (!isFetchingNextPage && !isLoading) return null;
     return (
       <ActivityIndicator
         style={styles.loadingIndicator}
@@ -89,6 +95,7 @@ const HomeScreen: React.FC = () => {
     );
   }, [isFetchingNextPage, isLoading]);
 
+
   return (
     <LinearGradient
       colors={[COLORS.primary, COLORS.transluscent, COLORS.transparent]}
@@ -96,16 +103,17 @@ const HomeScreen: React.FC = () => {
       <View style={styles.innerContainer}>
         <Header onLogout={handleLogout} />
         <View style={styles.content}>
-          <FlashList
+          <FlatList
             data={pokemonList}
             renderItem={renderItem}
             keyExtractor={(item) => item.name}
-            estimatedItemSize={100}
-            onEndReached={fetchNextPage}
+            onEndReached={handleEndReached}
             onEndReachedThreshold={0.5}
+            initialNumToRender={10}
+            maxToRenderPerBatch={30}
+            updateCellsBatchingPeriod={50}
+            windowSize={30}
             numColumns={2}
-            removeClippedSubviews
-            drawDistance={5}
             ListFooterComponent={renderFooter}
           />
         </View>
@@ -131,6 +139,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderTopEndRadius: BORDER_RADIUS.base,
     borderTopStartRadius: BORDER_RADIUS.base,
+  },
+  listContent: {
+    paddingBottom: SPACING[4],
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
   },
   loadingIndicator: {
     marginVertical: SPACING[4],
