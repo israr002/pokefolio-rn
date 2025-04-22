@@ -42,28 +42,37 @@ const WelcomeScreen = () => {
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
+    let hasNavigated = false;
 
     const checkInitialNotification = async () => {
       const initialNotification = await messaging().getInitialNotification();
 
-      if (initialNotification?.data) {
-        const { screen, pokemonId } = initialNotification.data;
-
-        if (screen === 'PokemonDetail' && pokemonId && user?.emailVerified) {
-          navigation.replace('PokemonDetail', { pokemonId: String(pokemonId) });
-          return;
-        }
+      if (
+        initialNotification?.data?.screen === 'PokemonDetail' &&
+        initialNotification.data.pokemonId &&
+        user?.emailVerified
+      ) {
+        hasNavigated = true;
+        navigation.replace('PokemonDetail', {
+          pokemonId: String(initialNotification.data.pokemonId),
+        });
+        return;
       }
 
-      timeoutId = setTimeout(() => {
-        if (!user) {
-          navigation.replace('Login');
-        } else if (!user.emailVerified) {
-          navigation.replace('EmailVerification', { email: user.email || '' });
-        } else {
-          navigation.replace('Home');
-        }
-      }, 2000);
+      if (!hasNavigated) {
+        timeoutId = setTimeout(() => {
+          if (hasNavigated) {return;}
+
+          hasNavigated = true;
+          if (!user) {
+            navigation.replace('Login');
+          } else if (!user.emailVerified) {
+            navigation.replace('EmailVerification', { email: user.email || '' });
+          } else {
+            navigation.replace('Home');
+          }
+        }, 2000);
+      }
     };
 
     if (!loading) {

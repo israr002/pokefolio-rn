@@ -65,7 +65,7 @@ const PokemonDetailScreen: React.FC = () => {
 
   const { pokemon, pokemonId } = route.params;
   const shouldFetch = !pokemon && !!pokemonId;
-  const { data: pokemonDetails, isLoading, error } = usePokemonDetails(
+  const { data: pokemonDetails, isLoading } = usePokemonDetails(
     shouldFetch ? String(pokemonId) : ''
   );
   const activePokemon = pokemonDetails || pokemon;
@@ -79,9 +79,20 @@ const PokemonDetailScreen: React.FC = () => {
   const imageTranslateX = useSharedValue(screenWidth);
 
   useEffect(() => {
-    cardTranslateY.value = withTiming(0, { duration: 500 });
-    imageTranslateX.value = withTiming(0, { duration: 700 });
-  }, [cardTranslateY, imageTranslateX]);
+    StatusBar.setTranslucent(true);
+    StatusBar.setBackgroundColor('transparent');
+    StatusBar.setBarStyle('light-content');
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && activePokemon) {
+      cardTranslateY.value = 500;
+      imageTranslateX.value = screenWidth;
+      cardTranslateY.value = withTiming(0, { duration: 500 });
+      imageTranslateX.value = withTiming(0, { duration: 700 });
+    }
+  }, [isLoading, activePokemon, cardTranslateY, imageTranslateX]);
+
 
   const cardStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: cardTranslateY.value }],
@@ -101,7 +112,6 @@ const PokemonDetailScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
       <PokemonDetailHeader
         pokemon={activePokemon}
         onBackPress={() => navigation.goBack()}

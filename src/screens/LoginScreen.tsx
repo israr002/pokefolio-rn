@@ -67,7 +67,7 @@ const LoginScreen = ({ navigation }: any) => {
       setIsGoogleLoading(true);
       const result = await signInWithGoogle();
       if (result.success) {
-        navigation.navigate('Home');
+        navigation.replace('Home');
       } else {
         setToast({ message: result.error || APP_CONSTANTS.UNKNOWN_ERROR, type: 'error' });
       }

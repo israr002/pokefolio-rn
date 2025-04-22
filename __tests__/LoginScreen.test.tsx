@@ -131,7 +131,7 @@ describe('LoginScreen', () => {
       user: { email: 'ash@pokemon.com' }
     });
 
-    const screen = renderWithNavigation(<LoginScreen navigation={{ navigate: mockNavigate }} />);
+    const screen = renderWithNavigation(<LoginScreen navigation={{ replace: mockNavigate }} />);
     const googleButton = screen.getByTestId('google-sign-in-button');
 
     fireEvent.press(googleButton);
