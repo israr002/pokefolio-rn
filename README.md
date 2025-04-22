@@ -1,97 +1,183 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Pokefolio - Your Personal Pokemon Collection
 
-# Getting Started
+A React Native application that allows users to browse, collect, and manage their favorite Pokemon. Built with TypeScript, React Native, and Firebase.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Demo
+Check out the app demo: [Watch Demo Video](https://www.loom.com/share/2620d2e6323940419739e580abcc1af4?sid=53d09392-bdc4-4c43-b845-660d97529bc9)
 
-## Step 1: Start Metro
+### Video Walkthrough:
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- **Google Authentication**: Demonstrates secure sign-in using Firebase Authentication with Google.
+- **Paginated Pokemon List**: Showcases infinite scroll implementation using PokéAPI.
+- **Navigation to Details Screen**: Tap on a Pokemon to view its types, abilities, and dynamically themed background.
+- **Push Notifications**: Firebase Cloud Messaging integrated to receive notifications.
+- **State Persistence**: Button state and login status are retained after restarting the app.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Features
 
-```sh
-# Using npm
-npm start
+- Browse and search Pokemon
+- View detailed Pokemon information
+- User authentication (Email & Google Sign-in)
+- Email verification
+- Push notifications for Pokemon updates
+- Responsive UI with animations
+- Profile picture upload (requires Firebase Storage setup)
 
-# OR using Yarn
-yarn start
-```
+## Prerequisites
 
-## Step 2: Build and run your app
+- Node.js (v20 or higher)
+- npm or yarn
+- React Native CLI
+- Xcode (for iOS development)
+- Android Studio (for Android development)
+- Firebase account
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## Setup Instructions
 
-### Android
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/pokefolio.git
+   cd pokefolio
+   ```
 
-```sh
-# Using npm
-npm run android
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-# OR using Yarn
-yarn android
-```
+3. **iOS Setup**
+   ```bash
+   cd ios
+   pod install
+   cd ..
+   ```
+
+4. **Environment Setup**
+
+   Create a `.env` file in the root directory with the following variables:
+   ```
+   # Google Sign-in Configuration
+   GOOGLE_WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID
+   GOOGLE_IOS_CLIENT_ID=YOUR_IOS_CLIENT_ID
+   ```
+
+5. **Firebase Setup**
+
+   - Create a new Firebase project
+   - Enable Email/Password and Google authentication
+   - Enable Firebase Storage (required for profile picture upload)
+     - Go to Firebase Console > Storage
+     - Click "Get Started"
+     - Choose a location for your storage
+     - Set up security rules for storage access
+   - Download the `google-services.json` file and place it in:
+     - Android: `android/app/google-services.json`
+     - iOS: `ios/GoogleService-Info.plist`
+
+6. **Google Sign-in Setup**
+
+   Follow these steps to set up Google Sign-in:
+
+   1. **Enable Google Sign-in in Firebase**:
+      - Go to Firebase Console
+      - Select your project
+      - Navigate to Authentication > Sign-in method
+      - Enable Google under "Sign-in providers"
+      - Set your Project Support Email
+
+   2. **Android Setup - Add SHA Fingerprints**:
+      - Go to Project settings > General
+      - Scroll to "Your apps" > Select Android app
+      - Add SHA-1 and SHA-256 fingerprints
+      - You can get these fingerprints using:
+        ```bash
+        # Using keytool
+        keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+        ```
+
+   3. **iOS Setup - Add Bundle ID**:
+      - In Firebase Console, go to Project settings > General
+      - Under "Your apps", ensure your iOS app is registered
+      - Add your Bundle ID (e.g., com.yourcompany.pokefolio)
+      - Download the updated `GoogleService-Info.plist`
+
+## Running the App
 
 ### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+```bash
 npm run ios
-
-# OR using Yarn
+# or
 yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Android
+```bash
+npm run android
+# or
+yarn android
+```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Project Structure
 
-## Step 3: Modify your app
+```
+src/
+├── api/           # API services and endpoints
+├── assets/        # Images, fonts, and other static assets
+├── components/    # Reusable UI components
+├── constants/     # App constants and configuration
+├── contexts/      # React contexts
+├── hooks/         # Custom React hooks
+├── navigation/    # Navigation configuration
+├── screens/       # Screen components
+├── services/      # Business logic and services
+├── theme/         # Theme configuration
+├── types/         # TypeScript type definitions
+└── utils/         # Utility functions
+```
 
-Now that you have successfully run the app, let's make changes!
+## Technical Approach
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+- **State Management**: React Query for server state and React Context for auth state
+- **Navigation**: React Navigation with TypeScript support
+- **Authentication**: Firebase Authentication
+- **API Integration**: Axios
+- **UI Components**: Custom components with consistent styling
+- **Testing**: Jest and React Native Testing Library
+- **Animations**: React Native Reanimated
+- **Push Notifications**: Firebase Cloud Messaging
+- **Persistent Storage**: MMKV 
+- **Color Extraction [Native Module]** : Native module for extracting color from pokemon image
+- **Storage**: Firebase Storage for profile pictures
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+## Assumptions and Limitations
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+1. **API Limitations**:
+   - Using the free PokeAPI which has rate limits
+   - Pokemon data are cached to improve performance
 
-## Congratulations! :tada:
+2. **Authentication**:
+   - Email verification is required for full access
+   - Google Sign-in requires proper setup in Google Cloud Console
+   - Profile picture upload requires Firebase Storage setup
 
-You've successfully run and modified your React Native App. :partying_face:
+3. **Device Support**:
+   - iOS 13.0 or later
+   - Android 6.0 (API level 23) or later
 
-### Now what?
+4. **Offline Support**:
+   - Basic offline functionality with cached data
+   - Some features require internet connection
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+5. **Storage**:
+   - Profile picture upload requires Firebase Storage
 
-# Troubleshooting
+## Testing
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Run the test suite:
+```bash
+npm test
+# or
+yarn test
+```
